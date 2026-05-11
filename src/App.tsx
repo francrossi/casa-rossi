@@ -107,6 +107,7 @@ function App() {
   const [reminderPersonali, setReminderPersonali] = useState<Reminder[]>([])
   const [storico, setStorico] = useState<StoricoSettimanale[]>([])
   const [activeWeek, setActiveWeek] = useState<ActiveWeek | null>(null)
+  const [settimanaInizialeInput, setSettimanaInizialeInput] = useState('')
   const [filtro, setFiltro] = useState<'tutti' | 'daFare' | 'fatti' | 'nonAssegnati'>('tutti')
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
 
@@ -271,6 +272,8 @@ function App() {
     })
   }
 
+  const [caricamentoCompletato, setCaricamentoCompletato] = useState(false)
+
   useEffect(() => {
     const saved = localStorage.getItem('casaRossiStato')
     if (saved) {
@@ -317,6 +320,7 @@ function App() {
     } else {
       setActiveWeek(createActiveWeek(new Date()))
     }
+    setCaricamentoCompletato(true)
   }, [])
 
   useEffect(() => {
@@ -326,22 +330,26 @@ function App() {
   }, [activeWeek, expandedDays])
 
   useEffect(() => {
+    if (!caricamentoCompletato) return
     localStorage.setItem('casaRossiStato', JSON.stringify(statoSettimana))
-  }, [statoSettimana])
+  }, [statoSettimana, caricamentoCompletato])
 
   useEffect(() => {
+    if (!caricamentoCompletato) return
     localStorage.setItem(reminderKey, JSON.stringify(reminderPersonali))
-  }, [reminderPersonali])
+  }, [reminderPersonali, caricamentoCompletato])
 
   useEffect(() => {
+    if (!caricamentoCompletato) return
     localStorage.setItem(storicoKey, JSON.stringify(storico))
-  }, [storico])
+  }, [storico, caricamentoCompletato])
 
   useEffect(() => {
+    if (!caricamentoCompletato) return
     if (activeWeek) {
       localStorage.setItem(activeWeekKey, JSON.stringify(activeWeek))
     }
-  }, [activeWeek])
+  }, [activeWeek, caricamentoCompletato])
 
   const assegnaCompito = (giorno: string, compito: string, persona: string | null) => {
     setStatoSettimana(prev => {
@@ -577,6 +585,41 @@ function App() {
     setStorico([])
   }
 
+  const impostaSettimanaIniziale = () => {
+    if (!settimanaInizialeInput) {
+      window.alert('Seleziona prima una data di inizio settimana.')
+      return
+    }
+
+    const nuovaData = new Date(`${settimanaInizialeInput}T12:00:00`)
+
+    if (Number.isNaN(nuovaData.getTime())) {
+      window.alert('Data non valida.')
+      return
+    }
+
+    if (!window.confirm('Vuoi impostare questa come settimana iniziale? I compiti della settimana corrente verranno azzerati.')) {
+      return
+    }
+
+    setActiveWeek(createActiveWeek(nuovaData))
+    setStatoSettimana(createInitialState())
+    setReminderPersonali(prev => prev.map(reminder => ({ ...reminder, fatto: false })))
+    setFiltro('tutti')
+    setSchermata('settimana')
+  }
+
+  const azzeraSettimanaCorrente = () => {
+    if (!window.confirm('Vuoi azzerare la settimana corrente? Tutti i compiti torneranno da fare e non assegnati.')) {
+      return
+    }
+
+    setStatoSettimana(createInitialState())
+    setReminderPersonali(prev => prev.map(reminder => ({ ...reminder, fatto: false })))
+    setFiltro('tutti')
+    setSchermata('settimana')
+  }
+
   const resetSettimana = () => {
     if (!window.confirm('Vuoi salvare questa settimana nello storico e iniziare una nuova settimana?')) {
       return
@@ -717,7 +760,26 @@ function App() {
                 </div>
               )
             })}
-            <button className="reset" onClick={resetSettimana}>Resetta Settimana</button>
+            <div className="week-controls">
+              <button className="reset" onClick={azzeraSettimanaCorrente}>
+                Azzera settimana corrente
+              </button>
+
+              <button className="reset" onClick={resetSettimana}>
+                Chiudi settimana e vai alla successiva
+              </button>
+
+              <div className="week-start-control">
+                <label htmlFor="settimana-iniziale">Imposta settimana iniziale</label>
+                <input
+                  id="settimana-iniziale"
+                  type="date"
+                  value={settimanaInizialeInput}
+                  onChange={e => setSettimanaInizialeInput(e.target.value)}
+                />
+                <button onClick={impostaSettimanaIniziale}>Imposta</button>
+              </div>
+            </div>
           </div>
         )}
         {schermata === 'classifica' && (
