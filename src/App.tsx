@@ -57,18 +57,28 @@ const persone = ['Francesco', 'Laura', 'Leonardo', 'Alessandro', 'Edoardo']
 const giorni = ['Sabato', 'Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì']
 
 const compiti: Compito[] = [
+  { nome: 'Gestione cibo e acqua di Appa', punti: 1, giorni: giorni },
+  { nome: 'Pulizia lettiera di Appa', punti: 1, giorni: giorni },
+  { nome: 'Riempire bottiglie acqua mattina', punti: 1, giorni: giorni },
+
+  { nome: 'Lavatrice carico e scarico', punti: 1, giorni: giorni },
+  { nome: 'Panni da stendere e ritirare', punti: 1, giorni: giorni },
+  { nome: 'Asciugatrice carico e scarico', punti: 1, giorni: giorni },
+
   { nome: 'Preparazione pranzo', punti: 2, giorni: giorni },
-  { nome: 'Preparazione cena', punti: 2, giorni: giorni },
-  { nome: 'Lavastoviglie pranzo', punti: 1, giorni: giorni },
-  { nome: 'Lavastoviglie cena', punti: 1, giorni: giorni },
   { nome: 'Apparecchiare pranzo', punti: 1, giorni: giorni },
   { nome: 'Sparecchiare pranzo', punti: 1, giorni: giorni },
+  { nome: 'Lavastoviglie pranzo', punti: 1, giorni: giorni },
+
+  { nome: 'Fare la spesa', punti: 3, giorni: ['Lunedì'] },
+  { nome: 'Annaffiare piante', punti: 1, giorni: ['Lunedì', 'Mercoledì', 'Venerdì'] },
+  { nome: 'Pulizia bagni', punti: 3, giorni: ['Sabato', 'Martedì'] },
+
+  { nome: 'Riempire bottiglie acqua sera', punti: 1, giorni: giorni },
+  { nome: 'Preparazione cena', punti: 2, giorni: giorni },
   { nome: 'Apparecchiare cena', punti: 1, giorni: giorni },
   { nome: 'Sparecchiare cena', punti: 1, giorni: giorni },
-  { nome: 'Pulizia bagni', punti: 3, giorni: ['Sabato', 'Martedì'] },
-  { nome: 'Fare la spesa', punti: 3, giorni: ['Lunedì'] },
-  { nome: 'Pulizia lettiera di Appa', punti: 1, giorni: giorni },
-  { nome: 'Gestione cibo e acqua di Appa', punti: 1, giorni: giorni }
+  { nome: 'Lavastoviglie cena', punti: 1, giorni: giorni }
 ]
 
 const reminderIniziali: Reminder[] = [
@@ -100,6 +110,7 @@ const reminderIniziali: Reminder[] = [
 const reminderKey = 'casaRossiReminderPersonali'
 const storicoKey = 'casaRossiStoricoSettimane'
 const activeWeekKey = 'casaRossiSettimanaAttiva'
+
 
 function App() {
   const [schermata, setSchermata] = useState<'settimana' | 'classifica' | 'personale' | 'storico'>('settimana')
@@ -182,29 +193,6 @@ function App() {
       end: endDate.toISOString(),
       label: `${formatDate(startDate)} – ${formatDate(endDate)}`
     }
-  }
-
-  const getTodayIndex = () => {
-    if (!activeWeek) {
-      return 0
-    }
-    const today = new Date()
-    const start = new Date(activeWeek.start)
-    const end = new Date(activeWeek.end)
-    if (today < start || today > end) {
-      return 0
-    }
-    const dayIndex = today.getDay()
-    return dayIndex === 0 ? 6 : dayIndex - 1
-  }
-
-  const initializeExpandedDays = () => {
-    const firstDay = getTodayIndex()
-    const expanded: Record<string, boolean> = {}
-    giorni.forEach((giorno, index) => {
-      expanded[giorno] = index === firstDay
-    })
-    return expanded
   }
 
   const normalizeStatoSettimana = (raw: unknown): StatoSettimana => {
@@ -324,10 +312,10 @@ function App() {
   }, [])
 
   useEffect(() => {
-    if (activeWeek && Object.keys(expandedDays).length === 0) {
-      setExpandedDays(initializeExpandedDays())
+    if (activeWeek) {
+      setExpandedDays({})
     }
-  }, [activeWeek, expandedDays])
+  }, [activeWeek])
 
   useEffect(() => {
     if (!caricamentoCompletato) return
@@ -497,7 +485,6 @@ function App() {
     }
     return true
   }
-
   const toggleDay = (giorno: string) => {
     setExpandedDays(prev => ({ ...prev, [giorno]: !prev[giorno] }))
   }
@@ -606,6 +593,7 @@ function App() {
     setStatoSettimana(createInitialState())
     setReminderPersonali(prev => prev.map(reminder => ({ ...reminder, fatto: false })))
     setFiltro('tutti')
+    setExpandedDays({})
     setSchermata('settimana')
   }
 
@@ -617,6 +605,7 @@ function App() {
     setStatoSettimana(createInitialState())
     setReminderPersonali(prev => prev.map(reminder => ({ ...reminder, fatto: false })))
     setFiltro('tutti')
+    setExpandedDays({})
     setSchermata('settimana')
   }
 
