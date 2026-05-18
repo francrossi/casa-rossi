@@ -2325,3 +2325,31 @@ input[type="date"] {
   }
 }
 
+
+/* === CASA ROSSI STICKY MAIN TABS === */
+
+.app > div:first-of-type {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  padding: 8px 0 !important;
+  margin-top: 8px !important;
+  margin-bottom: 14px !important;
+  background:
+    linear-gradient(180deg, rgba(251,252,248,0.96), rgba(251,252,248,0.80));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@media (max-width: 520px) {
+  .app > div:first-of-type {
+    top: env(safe-area-inset-top, 0px) !important;
+  }
+
+  .app > div:first-of-type button {
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
+    border-radius: 16px !important;
+  }
+}
+
