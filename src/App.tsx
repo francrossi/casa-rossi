@@ -127,6 +127,7 @@ const fasceGiornata: { id: FasciaGiornata; label: string; emoji: string }[] = [
 function App() {
   const [schermata, setSchermata] = useState<'settimana' | 'classifica' | 'personale' | 'storico'>('settimana')
   const [personaSelezionata, setPersonaSelezionata] = useState<string | null>(null)
+  const [personaClassificaSelezionata, setPersonaClassificaSelezionata] = useState<string | null>(null)
   const [statoSettimana, setStatoSettimana] = useState<StatoSettimana>({})
   const [reminderPersonali, setReminderPersonali] = useState<Reminder[]>([])
   const [storico, setStorico] = useState<StoricoSettimanale[]>([])
@@ -1121,10 +1122,55 @@ function App() {
               <p>Punti della settimana corrente e bilancio storico tra i membri della casa.</p>
             </div>
 
+            <div className="score-tabs" aria-label="Filtro classifica per membro">
+              <button
+                type="button"
+                className={!personaClassificaSelezionata ? 'active' : ''}
+                onClick={() => setPersonaClassificaSelezionata(null)}
+              >
+                Tutti
+              </button>
+              {persone.map(persona => (
+                <button
+                  key={persona}
+                  type="button"
+                  className={personaClassificaSelezionata === persona ? 'active' : ''}
+                  onClick={() => setPersonaClassificaSelezionata(persona)}
+                >
+                  {persona}
+                </button>
+              ))}
+            </div>
+
             {(() => {
               const ranking = calcolaClassifica()
+              const rankingDaMostrare = personaClassificaSelezionata
+                ? ranking.filter(([persona]) => persona === personaClassificaSelezionata)
+                : ranking
               const maxPoints = ranking[0]?.[1] ?? 0
               const { totals, tasksFatti, remindersFatti, quota, balance } = getStoricoBalance()
+              const personaFocus = personaClassificaSelezionata
+              const trendFocus = personaFocus
+                ? [...storico].reverse().map(entry => ({
+                  id: entry.id,
+                  weekLabel: entry.weekLabel,
+                  punti: entry.punteggi[personaFocus] ?? 0,
+                  compiti: entry.compitiFatti[personaFocus] ?? 0,
+                  reminder: entry.reminderFatti[personaFocus] ?? 0,
+                }))
+                : []
+              const maxTrendFocus = Math.max(1, ...trendFocus.map(item => item.punti))
+              const totalePuntiFocus = personaFocus ? totals[personaFocus] ?? 0 : 0
+              const compitiFocus = personaFocus ? tasksFatti[personaFocus] ?? 0 : 0
+              const reminderFocus = personaFocus ? remindersFatti[personaFocus] ?? 0 : 0
+              const balanceFocus = personaFocus ? balance[personaFocus] ?? 0 : 0
+              const messaggioFocus = !personaFocus
+                ? ''
+                : balanceFocus > 0
+                  ? `Ottimo lavoro, ${personaFocus}: sei sopra la quota equa.`
+                  : balanceFocus === 0
+                    ? `Perfetto equilibrio, ${personaFocus}: sei esattamente in linea con la quota.`
+                    : `Forza ${personaFocus}: puoi recuperare qualche punto nelle prossime settimane.`
 
               return (
                 <>
@@ -1138,7 +1184,8 @@ function App() {
                     </div>
 
                     <div className="leaderboard-list">
-                      {ranking.map(([persona, punti], index) => {
+                      {rankingDaMostrare.map(([persona, punti]) => {
+                        const index = ranking.findIndex(([nome]) => nome === persona)
                         const percent = maxPoints > 0 ? Math.round((punti / maxPoints) * 100) : 0
                         const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '•'
 
@@ -1147,7 +1194,13 @@ function App() {
                             <div className="rank-medal">{medal}</div>
                             <div className="rank-info">
                               <div className="rank-top">
-                                <strong>{persona}</strong>
+                                <button
+                                  type="button"
+                                  className={`score-name-button ${personaClassificaSelezionata === persona ? 'active' : ''}`}
+                                  onClick={() => setPersonaClassificaSelezionata(personaClassificaSelezionata === persona ? null : persona)}
+                                >
+                                  {persona}
+                                </button>
                                 <span>{punti} punti</span>
                               </div>
                               <div className="rank-track" aria-hidden="true">
@@ -1159,6 +1212,66 @@ function App() {
                       })}
                     </div>
                   </div>
+
+                  {personaFocus && (
+                    <div className="score-focus-panel">
+                      <div className="score-focus-head">
+                        <div>
+                          <span className="screen-eyebrow">Focus membro</span>
+                          <h2>{personaFocus}</h2>
+                        </div>
+                        <div className={`focus-balance-pill ${balanceFocus >= 0 ? 'credit' : 'debit'}`}>
+                          {balanceFocus >= 0 ? `+${balanceFocus}` : balanceFocus}
+                        </div>
+                      </div>
+
+                      <div className="focus-kpis">
+                        <div>
+                          <strong>{totalePuntiFocus}</strong>
+                          <span>punti storici</span>
+                        </div>
+                        <div>
+                          <strong>{compitiFocus}</strong>
+                          <span>compiti fatti</span>
+                        </div>
+                        <div>
+                          <strong>{reminderFocus}</strong>
+                          <span>reminder fatti</span>
+                        </div>
+                      </div>
+
+                      <div className="focus-message">
+                        {messaggioFocus}
+                      </div>
+
+                      <div className="focus-trend">
+                        <strong>Andamento settimane</strong>
+                        {trendFocus.length > 0 ? (
+                          <div className="focus-trend-list">
+                            {trendFocus.map(item => {
+                              const percent = Math.round((item.punti / maxTrendFocus) * 100)
+
+                              return (
+                                <div key={item.id} className="focus-trend-row">
+                                  <span>{item.weekLabel}</span>
+                                  <div className="focus-trend-track" aria-hidden="true">
+                                    <i style={{ width: `${percent}%` }} />
+                                  </div>
+                                  <b>{item.punti} pt</b>
+                                  <small>{item.compiti} compiti · {item.reminder} reminder</small>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <div className="empty-state-card">
+                            <strong>Nessuno storico personale</strong>
+                            <p>Il grafico apparirà dopo la chiusura della prima settimana.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <div className="historic-balance dashboard-panel">
                     <div className="panel-title-row">
@@ -1183,7 +1296,13 @@ function App() {
                           return (
                             <div key={persona} className={`balance-card ${isCredit ? 'credit' : 'debit'}`}>
                               <div className="balance-top">
-                                <strong>{persona}</strong>
+                                <button
+                                  type="button"
+                                  className={`score-name-button balance ${personaClassificaSelezionata === persona ? 'active' : ''}`}
+                                  onClick={() => setPersonaClassificaSelezionata(personaClassificaSelezionata === persona ? null : persona)}
+                                >
+                                  {persona}
+                                </button>
                                 <span>{isCredit ? `+${diff}` : diff}</span>
                               </div>
                               <small>{isCredit ? 'Credito' : 'Debito'}</small>

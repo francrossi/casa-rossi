@@ -3120,3 +3120,311 @@ input[type="date"] {
   }
 }
 
+
+/* === CASA ROSSI CLASSIFICA TABS DETAIL === */
+
+.classifica > .score-tabs {
+  position: sticky;
+  top: 8px;
+  z-index: 30;
+
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+
+  padding: 6px;
+  margin: 0 0 10px;
+
+  border: 1px solid rgba(36, 65, 42, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.classifica > .score-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.classifica > .score-tabs > button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  min-width: 54px;
+  padding: 7px 12px;
+
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.classifica > .score-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+@media (max-width: 520px) {
+  .classifica > .score-tabs {
+    top: 6px;
+  }
+
+  .classifica > .score-tabs > button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI SCORE NAME TOGGLE === */
+
+.score-name-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 36px !important;
+  padding: 6px 11px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.72) !important;
+  color: #142017 !important;
+
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.025em !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 6px 12px rgba(24,48,30,0.05) !important;
+
+  cursor: pointer !important;
+}
+
+.score-name-button.active {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.score-name-button.active::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.score-name-button.balance {
+  font-size: 1.05rem !important;
+}
+
+.score-name-button:focus-visible {
+  outline: 3px solid rgba(50,166,74,0.32);
+  outline-offset: 3px;
+}
+
+
+/* === CASA ROSSI CLASSIFICA FOCUS PERSONA === */
+
+.score-focus-panel {
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid rgba(50,166,74,0.30);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83,194,100,0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,249,243,0.94));
+  box-shadow:
+    0 18px 36px rgba(27,52,34,0.12),
+    0 0 0 4px rgba(50,166,74,0.06);
+}
+
+.score-focus-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.score-focus-head h2 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.focus-balance-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1.18rem;
+  font-weight: 950;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.14);
+}
+
+.focus-balance-pill.credit {
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+}
+
+.focus-balance-pill.debit {
+  background: linear-gradient(135deg, #ff665c, #df3c34);
+}
+
+.focus-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.focus-kpis div {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+}
+
+.focus-kpis strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.focus-kpis span {
+  display: block;
+  margin-top: 6px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.focus-message {
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+  color: #263629;
+  font-size: 0.95rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.focus-trend {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.72);
+}
+
+.focus-trend > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #142017;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.focus-trend-list {
+  display: grid;
+  gap: 9px;
+}
+
+.focus-trend-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 1.5fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.78);
+}
+
+.focus-trend-row span {
+  color: #334338;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.focus-trend-row b {
+  color: #142017;
+  font-size: 0.88rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.focus-trend-row small {
+  grid-column: 1 / -1;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.focus-trend-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #dfece2;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.10);
+}
+
+.focus-trend-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 520px) {
+  .score-focus-head {
+    flex-direction: column;
+  }
+
+  .focus-balance-pill {
+    width: 100%;
+  }
+
+  .focus-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .focus-trend-row {
+    grid-template-columns: 1fr;
+  }
+}
+
