@@ -128,6 +128,7 @@ function App() {
   const [schermata, setSchermata] = useState<'settimana' | 'classifica' | 'personale' | 'storico'>('settimana')
   const [personaSelezionata, setPersonaSelezionata] = useState<string | null>(null)
   const [personaClassificaSelezionata, setPersonaClassificaSelezionata] = useState<string | null>(null)
+  const [storicoSelezionatoId, setStoricoSelezionatoId] = useState<string | null>(null)
   const [statoSettimana, setStatoSettimana] = useState<StatoSettimana>({})
   const [reminderPersonali, setReminderPersonali] = useState<Reminder[]>([])
   const [storico, setStorico] = useState<StoricoSettimanale[]>([])
@@ -555,7 +556,11 @@ function App() {
   }
 
   const toggleDay = (giorno: string) => {
-    if (giornoSelezionato === giorno) return
+    if (giornoSelezionato === giorno) {
+      tornaAllaSettimana()
+      return
+    }
+
     apriGiorno(giorno)
   }
 
@@ -871,6 +876,14 @@ function App() {
           <button onClick={() => setSchermata('storico')} className={schermata === 'storico' ? 'active' : ''}>Storico</button>
         </nav>
       </header>
+
+      <nav className="main-sticky-tabs" aria-label="Navigazione principale">
+        <button onClick={() => setSchermata('settimana')} className={schermata === 'settimana' ? 'active' : ''}>Settimana</button>
+        <button onClick={() => setSchermata('classifica')} className={schermata === 'classifica' ? 'active' : ''}>Classifica</button>
+        <button onClick={() => setSchermata('personale')} className={schermata === 'personale' ? 'active' : ''}>Personale</button>
+        <button onClick={() => setSchermata('storico')} className={schermata === 'storico' ? 'active' : ''}>Storico</button>
+      </nav>
+
       <main>
         {schermata === 'settimana' && (
           <div className="settimana">
@@ -983,7 +996,13 @@ function App() {
                   key={giorno}
                   type="button"
                   className={giornoSelezionato === giorno ? 'active' : ''}
-                  onClick={() => apriGiorno(giorno)}
+                  onClick={() => {
+                    if (giornoSelezionato === giorno) {
+                      tornaAllaSettimana()
+                    } else {
+                      apriGiorno(giorno)
+                    }
+                  }}
                 >
                   {giorno.slice(0, 3)}
                 </button>
@@ -1135,7 +1154,9 @@ function App() {
                   key={persona}
                   type="button"
                   className={personaClassificaSelezionata === persona ? 'active' : ''}
-                  onClick={() => setPersonaClassificaSelezionata(persona)}
+                  onClick={() => {
+                    setPersonaClassificaSelezionata(personaClassificaSelezionata === persona ? null : persona)
+                  }}
                 >
                   {persona}
                 </button>
@@ -1343,7 +1364,9 @@ function App() {
                   key={persona}
                   type="button"
                   className={personaSelezionata === persona ? 'active' : ''}
-                  onClick={() => setPersonaSelezionata(persona)}
+                  onClick={() => {
+                    setPersonaSelezionata(personaSelezionata === persona ? null : persona)
+                  }}
                 >
                   {persona}
                 </button>
@@ -1487,14 +1510,63 @@ function App() {
               <p>Timeline delle settimane chiuse, con classifica finale, compiti e reminder completati.</p>
             </div>
             <h2 className="legacy-storico-title">Storico Settimane</h2>
+
+            {storico.length > 0 && (
+              <div className="history-tabs" aria-label="Navigazione storico settimane">
+                <button
+                  type="button"
+                  className={!storicoSelezionatoId ? 'active' : ''}
+                  onClick={() => setStoricoSelezionatoId(null)}
+                >
+                  Tutte
+                </button>
+                {storico.map(entry => (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    className={storicoSelezionatoId === entry.id ? 'active' : ''}
+                    onClick={() => {
+                      setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                    }}
+                  >
+                    {entry.weekLabel}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {storico.length === 0 ? (
               <p>Nessuna settimana salvata.</p>
             ) : (
               <div className="storico-list">
-                {storico.map(entry => (
-                  <div key={entry.id} className="storico-entry">
+                {(storicoSelezionatoId ? storico.filter(entry => entry.id === storicoSelezionatoId) : storico).map(entry => (
+                  <div
+                    key={entry.id}
+                    className={`storico-entry ${storicoSelezionatoId === entry.id ? 'selected-history' : 'history-summary-only'}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                      }
+                    }}
+                  >
                     <div className="storico-header">
-                      <h3>Settimana {entry.weekLabel}</h3>
+                      <button
+                        type="button"
+                        className={`history-week-button ${storicoSelezionatoId === entry.id ? 'active' : ''}`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                        }}
+                      >
+                        <span>Settimana</span>
+                        <strong>{entry.weekLabel}</strong>
+                      </button>
                       <div className="storico-meta">Salvata il {new Date(entry.savedAt).toLocaleString()}</div>
                     </div>
                     <div className="storico-grid">

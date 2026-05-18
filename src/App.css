@@ -3428,3 +3428,596 @@ input[type="date"] {
   }
 }
 
+
+/* === CASA ROSSI STORICO TABS DETAIL === */
+
+.storico > .history-tabs {
+  position: sticky;
+  top: 8px;
+  z-index: 30;
+
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+
+  padding: 6px;
+  margin: 0 0 10px;
+
+  border: 1px solid rgba(36, 65, 42, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.storico > .history-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.storico > .history-tabs > button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  min-width: 54px;
+  padding: 7px 12px;
+
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.storico > .history-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+.storico-entry.history-summary-only {
+  cursor: pointer;
+}
+
+.storico-entry.history-summary-only .storico-grid {
+  display: none !important;
+}
+
+.storico-entry.history-summary-only::after {
+  content: "Apri dettaglio";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: var(--green-dark);
+  font-size: 0.8rem;
+  font-weight: 950;
+}
+
+.storico-entry.selected-history {
+  border-color: rgba(50,166,74,0.34) !important;
+  box-shadow:
+    0 18px 36px rgba(27, 52, 34, 0.14),
+    0 0 0 4px rgba(50, 166, 74, 0.07) !important;
+}
+
+.storico-entry.history-summary-only:hover {
+  border-color: rgba(50,166,74,0.30) !important;
+}
+
+@media (max-width: 520px) {
+  .storico > .history-tabs {
+    top: 6px;
+  }
+
+  .storico > .history-tabs > button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI STORICO CARD TOGGLE BACK === */
+
+.storico-entry.selected-history {
+  cursor: pointer;
+}
+
+.storico-entry.selected-history::after {
+  content: "Mostra tutte le settimane";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: var(--green-dark);
+  font-size: 0.8rem;
+  font-weight: 950;
+}
+
+
+/* === CASA ROSSI WEEK TAB ACTIVE X === */
+
+.settimana > .week-day-tabs > button {
+  gap: 7px !important;
+}
+
+.settimana > .week-day-tabs > button.active:not(:first-child)::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+
+/* === CASA ROSSI SELECTED DAY NAME PILL === */
+
+/* Quando un giorno è aperto, il nome nella card diventa un pill verde con X */
+.giorno.selected-day .day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 38px !important;
+  padding: 7px 13px !important;
+
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.giorno.selected-day .day-name::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* In dettaglio il badge "Da iniziare / In corso / Completato" si compatta accanto al nome */
+.giorno.selected-day .day-title-row {
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+/* Il meno a destra resta, ma più discreto: il segnale principale ora è la X sul nome */
+.giorno.selected-day .day-open-indicator {
+  opacity: 0.55 !important;
+}
+
+/* Su mobile teniamo il pill leggibile ma non enorme */
+@media (max-width: 520px) {
+  .giorno.selected-day .day-name {
+    min-height: 36px !important;
+    padding: 7px 12px !important;
+    font-size: 1rem !important;
+  }
+
+  .giorno.selected-day .day-name::after {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* === CASA ROSSI ACTIVE DAY NAME IN CARD === */
+
+.giorno .day-name.active-day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 38px !important;
+  padding: 7px 13px !important;
+
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.giorno .day-name.active-day-name::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.giorno.selected-day .day-title-row {
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+@media (max-width: 520px) {
+  .giorno .day-name.active-day-name {
+    min-height: 36px !important;
+    padding: 7px 12px !important;
+    font-size: 1rem !important;
+  }
+
+  .giorno .day-name.active-day-name::after {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* === CASA ROSSI UNIFORM ACTIVE TAB X === */
+
+/* Aggiunge la X sui tab selezionati, esclusi Tutti/Tutte/Settimana */
+.personale > .people-tabs > button,
+.classifica > .score-tabs > button,
+.storico > .history-tabs > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+}
+
+.personale > .people-tabs > button.active:not(:first-child)::after,
+.classifica > .score-tabs > button.active:not(:first-child)::after,
+.storico > .history-tabs > button.active:not(:first-child)::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* Su mobile la X resta compatta */
+@media (max-width: 520px) {
+  .personale > .people-tabs > button.active:not(:first-child)::after,
+  .classifica > .score-tabs > button.active:not(:first-child)::after,
+  .storico > .history-tabs > button.active:not(:first-child)::after {
+    width: 18px;
+    height: 18px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI MAIN STICKY NAV + DAY NAME PILL === */
+
+/* Nasconde la vecchia nav dentro l'header: ora usiamo quella sticky fuori header */
+header > nav {
+  display: none !important;
+}
+
+/* Menu principale sempre visibile */
+.main-sticky-tabs {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 80 !important;
+
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+
+  padding: 8px !important;
+  margin: 10px 0 14px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.90) !important;
+  box-shadow:
+    0 12px 24px rgba(20, 32, 23, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.85) !important;
+
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  scrollbar-width: none !important;
+}
+
+.main-sticky-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.main-sticky-tabs > button {
+  flex: 1 0 auto !important;
+  min-height: 44px !important;
+  padding: 9px 14px !important;
+
+  border-radius: 999px !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+.main-sticky-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 10px 22px rgba(50,166,74,0.25) !important;
+}
+
+/* I tab secondari devono stare sotto al menu principale sticky */
+.settimana > .week-day-tabs,
+.personale > .people-tabs,
+.classifica > .score-tabs,
+.storico > .history-tabs {
+  top: 68px !important;
+}
+
+/* Nome giorno nella card: pill bianco anche quando NON selezionato */
+.giorno .day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 36px !important;
+  padding: 7px 13px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.74) !important;
+  color: #142017 !important;
+
+  font-size: 1.02rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 7px 14px rgba(24,48,30,0.05) !important;
+}
+
+/* Nome giorno selezionato: pill verde con X */
+.giorno .day-name.active-day-name {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.giorno .day-name.active-day-name::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 21px;
+  height: 21px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.giorno .day-title-row {
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+@media (max-width: 520px) {
+  .main-sticky-tabs {
+    top: env(safe-area-inset-top, 0px) !important;
+    gap: 5px !important;
+    padding: 6px !important;
+    margin: 8px 0 12px !important;
+  }
+
+  .main-sticky-tabs > button {
+    min-height: 40px !important;
+    padding: 8px 9px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .settimana > .week-day-tabs,
+  .personale > .people-tabs,
+  .classifica > .score-tabs,
+  .storico > .history-tabs {
+    top: 58px !important;
+  }
+
+  .giorno .day-name {
+    min-height: 34px !important;
+    padding: 7px 11px !important;
+    font-size: 0.96rem !important;
+  }
+
+  .giorno .day-name.active-day-name::after {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+
+/* === CASA ROSSI HISTORY WEEK PILL === */
+
+.history-week-button {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 62px !important;
+  padding: 10px 15px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,0.74) !important;
+  color: #142017 !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 7px 14px rgba(24,48,30,0.05) !important;
+
+  cursor: pointer !important;
+  text-align: left !important;
+}
+
+.history-week-button span {
+  display: block;
+  color: #6a766c;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.history-week-button strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: #142017;
+  font-size: 1.18rem;
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.history-week-button.active {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(50,166,74,0.24) !important;
+}
+
+.history-week-button.active span,
+.history-week-button.active strong {
+  color: #ffffff !important;
+}
+
+.history-week-button.active strong::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* Anche il tab settimana in alto mostra la X quando selezionato */
+.storico > .history-tabs > button.active:not(:first-child)::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.storico > .history-tabs > button {
+  gap: 7px !important;
+}
+
+@media (max-width: 520px) {
+  .history-week-button {
+    min-height: 56px !important;
+    padding: 9px 13px !important;
+    border-radius: 20px !important;
+  }
+
+  .history-week-button strong {
+    font-size: 1.02rem;
+  }
+
+  .history-week-button.active strong::after {
+    width: 20px;
+    height: 20px;
+  }
+}
+
