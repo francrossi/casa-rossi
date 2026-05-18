@@ -121,14 +121,6 @@ const fasceGiornata: { id: FasciaGiornata; label: string; emoji: string }[] = [
   { id: 'sera', label: 'Sera', emoji: '🌙' },
 ]
 
-const getDefaultFasciaGiornata = (): FasciaGiornata => {
-  const hour = new Date().getHours()
-
-  if (hour < 11) return 'mattina'
-  if (hour < 15) return 'pranzo'
-  if (hour < 19) return 'pomeriggio'
-  return 'sera'
-}
 
 
 function App() {
@@ -139,7 +131,7 @@ function App() {
   const [activeWeek, setActiveWeek] = useState<ActiveWeek | null>(null)
   const [settimanaInizialeInput, setSettimanaInizialeInput] = useState('')
   const [filtro, setFiltro] = useState<'tutti' | 'daFare' | 'fatti' | 'nonAssegnati'>('tutti')
-  const [fasciaGiornata, setFasciaGiornata] = useState<FasciaGiornata>(() => getDefaultFasciaGiornata())
+  const [fasciaGiornata, setFasciaGiornata] = useState<FasciaGiornata>('tutti')
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
 
   const createInitialState = (): StatoSettimana => {
@@ -533,7 +525,7 @@ function App() {
 
   const toggleDay = (giorno: string) => {
     const wasOpen = Boolean(expandedDays[giorno])
-    setFasciaGiornata(getDefaultFasciaGiornata())
+    setFasciaGiornata('tutti')
     setExpandedDays(wasOpen ? {} : { [giorno]: true })
   }
 
@@ -736,6 +728,10 @@ function App() {
     }
   })()
 
+  const weeklyProgress = filterCounts.total > 0
+    ? Math.round((filterCounts.fatti / filterCounts.total) * 100)
+    : 0
+
   return (
     <div className="app">
       <header>
@@ -770,6 +766,38 @@ function App() {
                 <div>{getWeekSummary().nonAssegnati}</div>
               </div>
             </div>
+            <div className="mission-console">
+              <div className="mission-head">
+                <div>
+                  <span className="mission-eyebrow">Console settimana</span>
+                  <strong>Missione famiglia</strong>
+                </div>
+                <div className="mission-percent">{weeklyProgress}%</div>
+              </div>
+
+              <div className="mission-track" aria-label={`Progresso settimana ${weeklyProgress}%`}>
+                <span style={{ width: `${weeklyProgress}%` }} />
+              </div>
+
+              <div className="mission-grid">
+                <div className="mission-chip">
+                  <span className="mission-led led-green" />
+                  <b>{filterCounts.fatti}</b>
+                  <small>fatti</small>
+                </div>
+                <div className="mission-chip">
+                  <span className="mission-led led-amber" />
+                  <b>{filterCounts.daFare}</b>
+                  <small>da fare</small>
+                </div>
+                <div className="mission-chip">
+                  <span className="mission-led led-red" />
+                  <b>{filterCounts.nonAssegnati}</b>
+                  <small>non assegnati</small>
+                </div>
+              </div>
+            </div>
+
             <div className="filter-buttons">
               <button className={filtro === 'tutti' ? 'active' : ''} onClick={() => { setFiltro('tutti'); setExpandedDays({}) }}>
                 <span className="filter-label">Tutti</span>
@@ -803,15 +831,29 @@ function App() {
               const { total, fatti } = getDayStats(giorno)
               const expanded = expandedDays[giorno]
               const tasks = compiti.filter(c => c.giorni.includes(giorno) && filterCompiti(c, giorno) && filterFasciaCompito(c))
+              const dayPercent = total > 0 ? Math.round((fatti / total) * 100) : 0
+              const dayMood = total > 0 && fatti === total ? 'done' : fatti > 0 ? 'progress' : 'todo'
+              const dayStatus = dayMood === 'done' ? 'Completato' : dayMood === 'progress' ? 'In corso' : 'Da iniziare'
               return (
-                <div key={giorno} className={`giorno ${expanded ? 'expanded' : 'collapsed'}`}>
+                <div key={giorno} className={`giorno ${expanded ? 'expanded' : 'collapsed'} ${dayMood}`}>
                   <button type="button" className="day-toggle" onClick={() => toggleDay(giorno)}>
-                    <span>{giorno}</span>
-                    <span>{fatti}/{total} fatti</span>
-                  <div className="day-progress" aria-hidden="true">
-                    <span style={{ width: `${total > 0 ? (fatti / total) * 100 : 0}%` }} />
-                  </div>
+                    <div className="day-main">
+                      <div className="day-title-row">
+                        <span className="day-name">{giorno}</span>
+                        <span className={`day-state ${dayMood}`}>{dayStatus}</span>
+                      </div>
+                      <span className="day-subtitle">{fatti}/{total} fatti</span>
+                    </div>
+
+                    <div className="day-score">
+                      <strong>{dayPercent}%</strong>
+                      <span className="day-open-indicator">{expanded ? '−' : '+'}</span>
+                    </div>
                   </button>
+
+                  <div className="day-progress" aria-hidden="true">
+                    <span style={{ width: `${dayPercent}%` }} />
+                  </div>
                   {expanded && (
                     <div className="compiti">
                   <div className="time-filter" role="tablist" aria-label="Filtro fascia giornata">
@@ -841,15 +883,27 @@ function App() {
                               <span className="compito-stato">{stato.fatto ? 'Fatto' : 'Da fare'}</span>
                             </div>
                             <div className="compito-actions">
-                              <select
-                                value={stato.assegnato || ''}
-                                disabled={stato.fatto}
-                                className={stato.fatto ? 'select-disabled' : ''}
-                                onChange={(e) => assegnaCompito(giorno, compito.nome, e.target.value || null)}
-                              >
-                                <option value="">Nessuno</option>
-                                {persone.map(p => <option key={p} value={p}>{p}</option>)}
-                              </select>
+                              <div className="assign-panel" aria-label={`Assegna ${compito.nome}`}>
+                                <button
+                                  type="button"
+                                  className={!stato.assegnato ? 'active' : ''}
+                                  disabled={stato.fatto}
+                                  onClick={() => assegnaCompito(giorno, compito.nome, null)}
+                                >
+                                  Nessuno
+                                </button>
+                                {persone.map(persona => (
+                                  <button
+                                    key={persona}
+                                    type="button"
+                                    className={stato.assegnato === persona ? 'active' : ''}
+                                    disabled={stato.fatto}
+                                    onClick={() => assegnaCompito(giorno, compito.nome, persona)}
+                                  >
+                                    {persona}
+                                  </button>
+                                ))}
+                              </div>
                               <button onClick={() => segnaFatto(giorno, compito.nome)}>
                                 {stato.fatto ? 'Annulla' : 'Fatto'}
                               </button>
