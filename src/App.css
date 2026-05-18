@@ -1547,3 +1547,672 @@ input[type="date"] {
   }
 }
 
+
+/* === CASA ROSSI CLASSIFICA SCOREBOARD === */
+
+.screen-title-card,
+.dashboard-panel,
+.leaderboard-console {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.13), transparent 34%),
+    rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+}
+
+.screen-title-card {
+  padding: 20px;
+}
+
+.screen-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.screen-title-card h2,
+.panel-title-row h2 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.screen-title-card p {
+  margin: 8px 0 0;
+  color: #667369;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.leaderboard-console {
+  padding: 18px;
+}
+
+.leaderboard-head,
+.panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.leaderboard-head strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.leaderboard-total,
+.quota-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 17px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 950;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.14);
+}
+
+.quota-pill {
+  background: rgba(35,123,52,0.11);
+  color: var(--green-dark);
+  box-shadow: none;
+}
+
+.leaderboard-list {
+  display: grid;
+  gap: 10px;
+}
+
+.rank-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  min-height: 76px;
+  padding: 13px;
+  border: 1px solid rgba(36,65,42,0.13);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f7faf6);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.rank-card.rank-1 {
+  border-color: rgba(255,181,71,0.58);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,181,71,0.20), transparent 34%),
+    linear-gradient(180deg, #fffaf0, #fff5e3);
+}
+
+.rank-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 17px;
+  background: rgba(255,255,255,0.7);
+  font-size: 1.45rem;
+}
+
+.rank-info {
+  min-width: 0;
+}
+
+.rank-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.rank-top strong {
+  color: #142017;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.rank-top span {
+  color: #263629;
+  font-size: 0.94rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.rank-track {
+  height: 11px;
+  border-radius: 999px;
+  background: #dfece2;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.10);
+}
+
+.rank-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+.dashboard-panel {
+  padding: 18px;
+}
+
+.empty-state-card {
+  padding: 16px;
+  border: 1px dashed rgba(36,65,42,0.20);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.62);
+}
+
+.empty-state-card strong {
+  display: block;
+  color: #142017;
+  font-weight: 950;
+}
+
+.empty-state-card p {
+  margin: 6px 0 0;
+  color: #667369;
+}
+
+.balance-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.balance-card {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.13);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8fbf7);
+}
+
+.balance-card.credit {
+  border-color: rgba(50,166,74,0.28);
+}
+
+.balance-card.debit {
+  border-color: rgba(239,69,61,0.25);
+}
+
+.balance-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.balance-top strong {
+  color: #142017;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.balance-top span {
+  color: #142017;
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
+.balance-card.credit .balance-top span {
+  color: var(--green-dark);
+}
+
+.balance-card.debit .balance-top span {
+  color: var(--red);
+}
+
+.balance-card small {
+  display: inline-flex;
+  margin-top: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: #415044;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.balance-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.balance-meta span {
+  display: inline-flex;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  color: #667369;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+@media (max-width: 430px) {
+  .leaderboard-head,
+  .panel-title-row {
+    flex-direction: column;
+  }
+
+  .leaderboard-total,
+  .quota-pill {
+    width: 100%;
+  }
+}
+
+
+/* === CASA ROSSI PERSONALE DASHBOARD === */
+
+.people-dashboard {
+  display: grid;
+  gap: 14px;
+}
+
+.person-card {
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.13), transparent 34%),
+    rgba(255,255,255,0.93);
+  box-shadow: var(--shadow);
+}
+
+.person-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.person-head h3 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.person-percent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 50px;
+  padding: 0 13px;
+  border-radius: 18px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 950;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.14);
+}
+
+.person-track {
+  height: 14px;
+  margin: 16px 0 14px;
+  border-radius: 999px;
+  background: #dfece2;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.10);
+}
+
+.person-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+.person-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.person-kpis div {
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+}
+
+.person-kpis strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.person-kpis span {
+  display: block;
+  margin-top: 6px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.personal-sections {
+  display: grid;
+  gap: 10px;
+}
+
+.personal-panel {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.13);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8fbf7);
+}
+
+.personal-panel.todo {
+  border-color: rgba(255,181,71,0.42);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,181,71,0.15), transparent 34%),
+    linear-gradient(180deg, #fffaf0, #fff6e8);
+}
+
+.personal-panel.done {
+  border-color: rgba(50,166,74,0.28);
+}
+
+.personal-panel.reminder {
+  border-color: rgba(50,166,74,0.20);
+}
+
+.personal-panel > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #142017;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.personal-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personal-panel li {
+  padding: 10px 11px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  color: #334338;
+  font-size: 0.93rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.reminder-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.reminder-item button {
+  min-height: 38px;
+  padding: 7px 12px;
+  border-radius: 14px;
+  font-size: 0.86rem;
+  font-weight: 950;
+}
+
+@media (max-width: 430px) {
+  .person-head {
+    flex-direction: column;
+  }
+
+  .person-percent {
+    width: 100%;
+  }
+
+  .person-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .reminder-item {
+    grid-template-columns: 1fr;
+  }
+
+  .reminder-item button {
+    width: 100%;
+  }
+}
+
+
+/* === CASA ROSSI STORICO TIMELINE === */
+
+.storico > h2 {
+  display: none;
+}
+
+.storico > p {
+  padding: 18px;
+  border: 1px dashed rgba(36,65,42,0.22);
+  border-radius: 24px;
+  background: rgba(255,255,255,0.82);
+  color: #667369;
+  font-weight: 850;
+  box-shadow: var(--shadow);
+}
+
+.storico::before {
+  content: "Archivio settimane";
+  display: block;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.13), transparent 34%),
+    rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.storico::after {
+  content: "Timeline delle settimane chiuse, con classifica finale, compiti e reminder completati.";
+  display: block;
+  margin-top: -22px;
+  padding: 0 20px 18px;
+  color: #667369;
+  font-size: 0.96rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.storico-list {
+  position: relative;
+  display: grid;
+  gap: 14px;
+}
+
+.storico-list::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.16);
+}
+
+.storico-entry {
+  position: relative;
+  overflow: hidden;
+  margin-left: 26px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,181,71,0.14), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,251,247,0.94));
+  box-shadow: var(--shadow);
+}
+
+.storico-entry::before {
+  content: "";
+  position: absolute;
+  left: -33px;
+  top: 24px;
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow:
+    0 0 0 7px rgba(50,166,74,0.14),
+    0 0 18px rgba(50,166,74,0.28);
+}
+
+.storico-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.storico-header h3 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.24rem;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.storico-meta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: #536255;
+  font-size: 0.78rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.storico-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+
+.storico-grid > div {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.76);
+}
+
+.storico-grid strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #142017;
+  font-size: 0.95rem;
+  font-weight: 950;
+}
+
+.storico-grid ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.storico-grid li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.78);
+  color: #334338;
+  font-size: 0.9rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.storico-reset {
+  width: 100% !important;
+  min-height: 54px !important;
+  margin-top: 4px !important;
+  border-radius: 19px !important;
+  background: linear-gradient(135deg, #ff665c, #df3c34) !important;
+  color: #ffffff !important;
+  font-weight: 950 !important;
+  box-shadow: 0 12px 24px rgba(239,77,66,0.24) !important;
+}
+
+@media (max-width: 430px) {
+  .storico-entry {
+    margin-left: 18px;
+  }
+
+  .storico-header {
+    flex-direction: column;
+  }
+
+  .storico-meta {
+    white-space: normal;
+  }
+}
+
+
+/* === CASA ROSSI STORICO TITLE FIX === */
+
+.storico::before,
+.storico::after {
+  content: none !important;
+  display: none !important;
+}
+
+.legacy-storico-title {
+  display: none !important;
+}
+
+.storico-title-card {
+  margin-bottom: 0 !important;
+}
+

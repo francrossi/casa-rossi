@@ -940,121 +940,202 @@ function App() {
         )}
         {schermata === 'classifica' && (
           <div className="classifica">
-            <h2>Classifica settimana corrente</h2>
-            <ul>
-              {calcolaClassifica().map(([persona, punti]) => (
-                <li key={persona}>{persona}: {punti} punti</li>
-              ))}
-            </ul>
-            <div className="historic-balance">
-              <h2>Bilancio storico</h2>
-              {storico.length === 0 ? (
-                <p>Nessuno storico disponibile. Il bilancio si formerà dopo il primo reset settimana.</p>
-              ) : (
-                <div className="balances-grid">
-                  {(() => {
-                    const { totals, tasksFatti, remindersFatti, quota, balance } = getStoricoBalance()
-                    return (
-                      <>
-                        <div>
-                          <strong>Punti totali storici</strong>
-                          <ul>
-                            {Object.entries(totals).map(([persona, punti]) => (
-                              <li key={persona}>{persona}: {punti}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Compiti fatti storici</strong>
-                          <ul>
-                            {Object.entries(tasksFatti).map(([persona, count]) => (
-                              <li key={persona}>{persona}: {count}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Reminder fatti storici</strong>
-                          <ul>
-                            {Object.entries(remindersFatti).map(([persona, count]) => (
-                              <li key={persona}>{persona}: {count}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Quota equa</strong>
-                          <div>{Math.round(quota * 100) / 100} punti</div>
-                        </div>
-                        <div>
-                          <strong>Credito / Debito</strong>
-                          <ul>
-                            {Object.entries(balance).map(([persona, diff]) => (
-                              <li key={persona}>{persona}: {diff >= 0 ? `Credito +${diff}` : `Debito ${diff}`}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    )
-                  })()}
-                </div>
-              )}
+            <div className="screen-title-card">
+              <span className="screen-eyebrow">Scoreboard</span>
+              <h2>Classifica famiglia</h2>
+              <p>Punti della settimana corrente e bilancio storico tra i membri della casa.</p>
             </div>
+
+            {(() => {
+              const ranking = calcolaClassifica()
+              const maxPoints = ranking[0]?.[1] ?? 0
+              const { totals, tasksFatti, remindersFatti, quota, balance } = getStoricoBalance()
+
+              return (
+                <>
+                  <div className="leaderboard-console">
+                    <div className="leaderboard-head">
+                      <div>
+                        <span className="mission-eyebrow">Settimana corrente</span>
+                        <strong>Podio attività</strong>
+                      </div>
+                      <div className="leaderboard-total">{maxPoints} pt</div>
+                    </div>
+
+                    <div className="leaderboard-list">
+                      {ranking.map(([persona, punti], index) => {
+                        const percent = maxPoints > 0 ? Math.round((punti / maxPoints) * 100) : 0
+                        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '•'
+
+                        return (
+                          <div key={persona} className={`rank-card rank-${index + 1}`}>
+                            <div className="rank-medal">{medal}</div>
+                            <div className="rank-info">
+                              <div className="rank-top">
+                                <strong>{persona}</strong>
+                                <span>{punti} punti</span>
+                              </div>
+                              <div className="rank-track" aria-hidden="true">
+                                <span style={{ width: `${percent}%` }} />
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="historic-balance dashboard-panel">
+                    <div className="panel-title-row">
+                      <div>
+                        <span className="screen-eyebrow">Bilancio storico</span>
+                        <h2>Credito / Debito</h2>
+                      </div>
+                      <span className="quota-pill">Quota equa {Math.round(quota * 100) / 100} pt</span>
+                    </div>
+
+                    {storico.length === 0 ? (
+                      <div className="empty-state-card">
+                        <strong>Nessuno storico disponibile</strong>
+                        <p>Il bilancio si formerà dopo il primo reset settimana.</p>
+                      </div>
+                    ) : (
+                      <div className="balance-cards">
+                        {persone.map(persona => {
+                          const diff = balance[persona] ?? 0
+                          const isCredit = diff >= 0
+
+                          return (
+                            <div key={persona} className={`balance-card ${isCredit ? 'credit' : 'debit'}`}>
+                              <div className="balance-top">
+                                <strong>{persona}</strong>
+                                <span>{isCredit ? `+${diff}` : diff}</span>
+                              </div>
+                              <small>{isCredit ? 'Credito' : 'Debito'}</small>
+                              <div className="balance-meta">
+                                <span>{totals[persona] ?? 0} pt storici</span>
+                                <span>{tasksFatti[persona] ?? 0} compiti</span>
+                                <span>{remindersFatti[persona] ?? 0} reminder</span>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )
+            })()}
           </div>
         )}
         {schermata === 'personale' && (
           <div className="personale">
-            <h2>Riepilogo Personale</h2>
-            {persone.map(persona => {
-              const compiti = compitiPersonali(persona)
-              const reminder = reminderPersonale(persona)
-              return (
-                <div key={persona} className="persona-riepilogo">
-                  <h3>{persona}</h3>
-                  <div className="persona-section">
-                    <div>
-                      <strong>Compiti da fare</strong>
-                      <ul>
-                        {compiti.daFare.length > 0 ? compiti.daFare.map(item => <li key={item}>{item}</li>) : <li>Nessun compito da fare</li>}
-                      </ul>
+            <div className="screen-title-card">
+              <span className="screen-eyebrow">Dashboard personale</span>
+              <h2>Riepilogo membri</h2>
+              <p>Controlla compiti, reminder e avanzamento individuale di ogni membro della famiglia.</p>
+            </div>
+
+            <div className="people-dashboard">
+              {persone.map(persona => {
+                const personalTasks = compitiPersonali(persona)
+                const reminders = reminderPersonale(persona)
+
+                const openItems = personalTasks.daFare.length + reminders.daFare.length
+                const doneItems = personalTasks.fatti.length + reminders.fatti.length
+                const totalItems = openItems + doneItems
+                const progress = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0
+
+                return (
+                  <div key={persona} className="person-card">
+                    <div className="person-head">
+                      <div>
+                        <span className="screen-eyebrow">Membro famiglia</span>
+                        <h3>{persona}</h3>
+                      </div>
+                      <div className="person-percent">{progress}%</div>
                     </div>
-                    <div>
-                      <strong>Compiti fatti</strong>
-                      <ul>
-                        {compiti.fatti.length > 0 ? compiti.fatti.map(item => <li key={item}>{item}</li>) : <li>Nessun compito fatto</li>}
-                      </ul>
+
+                    <div className="person-track" aria-hidden="true">
+                      <span style={{ width: `${progress}%` }} />
+                    </div>
+
+                    <div className="person-kpis">
+                      <div>
+                        <strong>{personalTasks.daFare.length}</strong>
+                        <span>compiti da fare</span>
+                      </div>
+                      <div>
+                        <strong>{personalTasks.fatti.length}</strong>
+                        <span>compiti fatti</span>
+                      </div>
+                      <div>
+                        <strong>{reminders.daFare.length}</strong>
+                        <span>reminder aperti</span>
+                      </div>
+                      <div>
+                        <strong>{reminders.fatti.length}</strong>
+                        <span>reminder fatti</span>
+                      </div>
+                    </div>
+
+                    <div className="personal-sections">
+                      <div className="personal-panel todo">
+                        <strong>Compiti da fare</strong>
+                        <ul>
+                          {personalTasks.daFare.length > 0
+                            ? personalTasks.daFare.map(item => <li key={item}>{item}</li>)
+                            : <li>Nessun compito da fare</li>}
+                        </ul>
+                      </div>
+
+                      <div className="personal-panel done">
+                        <strong>Compiti fatti</strong>
+                        <ul>
+                          {personalTasks.fatti.length > 0
+                            ? personalTasks.fatti.map(item => <li key={item}>{item}</li>)
+                            : <li>Nessun compito fatto</li>}
+                        </ul>
+                      </div>
+
+                      <div className="personal-panel reminder">
+                        <strong>Reminder da fare</strong>
+                        <ul>
+                          {reminders.daFare.length > 0 ? reminders.daFare.map(item => (
+                            <li key={item.id} className="reminder-item">
+                              <span>{item.nome}</span>
+                              <button onClick={() => toggleReminder(item.id)}>Fatto</button>
+                            </li>
+                          )) : <li>Nessun reminder da fare</li>}
+                        </ul>
+                      </div>
+
+                      <div className="personal-panel done">
+                        <strong>Reminder fatti</strong>
+                        <ul>
+                          {reminders.fatti.length > 0 ? reminders.fatti.map(item => (
+                            <li key={item.id} className="reminder-item">
+                              <span>{item.nome}</span>
+                              <button onClick={() => toggleReminder(item.id)}>Annulla</button>
+                            </li>
+                          )) : <li>Nessun reminder fatto</li>}
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                  <div className="persona-section">
-                    <div>
-                      <strong>Reminder da fare</strong>
-                      <ul>
-                        {reminder.daFare.length > 0 ? reminder.daFare.map(item => (
-                          <li key={item.id} className="reminder-item">
-                            <span>{item.nome}</span>
-                            <button onClick={() => toggleReminder(item.id)}>Fatto</button>
-                          </li>
-                        )) : <li>Nessun reminder da fare</li>}
-                      </ul>
-                    </div>
-                    <div>
-                      <strong>Reminder fatti</strong>
-                      <ul>
-                        {reminder.fatti.length > 0 ? reminder.fatti.map(item => (
-                          <li key={item.id} className="reminder-item">
-                            <span>{item.nome}</span>
-                            <button onClick={() => toggleReminder(item.id)}>Annulla</button>
-                          </li>
-                        )) : <li>Nessun reminder fatto</li>}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         )}
         {schermata === 'storico' && (
           <div className="storico">
-            <h2>Storico Settimane</h2>
+            <div className="screen-title-card storico-title-card">
+              <span className="screen-eyebrow">Archivio settimane</span>
+              <h2>Storico settimane</h2>
+              <p>Timeline delle settimane chiuse, con classifica finale, compiti e reminder completati.</p>
+            </div>
+            <h2 className="legacy-storico-title">Storico Settimane</h2>
             {storico.length === 0 ? (
               <p>Nessuna settimana salvata.</p>
             ) : (
