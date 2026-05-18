@@ -1,526 +1,4023 @@
-.app {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  padding: 1rem;
-  box-sizing: border-box;
+:root {
+  --bg: #f4f7f0;
+  --panel: rgba(255, 255, 255, 0.92);
+  --panel-strong: #ffffff;
+  --text: #172219;
+  --muted: #657066;
+  --line: rgba(36, 65, 42, 0.16);
+  --green: #32a64a;
+  --green-dark: #237b34;
+  --green-soft: #e9f8ed;
+  --cream: #fff8ee;
+  --cream-line: #efc993;
+  --red: #ef453d;
+  --amber: #ffb547;
+  --shadow: 0 12px 30px rgba(27, 52, 34, 0.10);
 }
 
-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-header h1 {
-  margin-bottom: 0.5rem;
-}
-
-header p {
-  margin-bottom: 0.25rem;
-  font-style: italic;
-}
-
-.week-label {
-  margin: 0 0 1rem;
-  font-weight: 500;
+body {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(62, 174, 83, 0.22), transparent 32%),
+    radial-gradient(circle at 100% 8%, rgba(255, 202, 119, 0.36), transparent 28%),
+    linear-gradient(180deg, #fbfcf8 0%, var(--bg) 100%);
   color: var(--text);
 }
 
-nav {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+#root {
+  width: 100%;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 16px 12px 80px;
 }
 
-nav button {
-  flex: 1;
-  max-width: 100px;
+/* Header */
+
+h1 {
+  margin: 6px 0 4px;
+  color: #102017;
+  font-size: clamp(2.35rem, 10vw, 3.35rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
+  font-weight: 900;
+  text-align: left;
 }
 
-nav button.active {
-  background: var(--accent);
+p {
+  color: var(--muted);
+}
+
+#root > p {
+  margin: 4px 0;
+  text-align: left;
+}
+
+#root > p:first-of-type {
+  font-size: 1rem;
+  font-style: italic;
+}
+
+#root > p:nth-of-type(2) {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 10px 0 14px;
+  padding: 8px 13px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.74);
+  color: #536255;
+  font-size: 0.92rem;
+  font-style: normal;
+}
+
+#root > p:nth-of-type(2)::before {
+  content: "●";
+  color: var(--green);
+  font-size: 0.7rem;
+}
+
+/* Bottoni */
+
+button {
+  appearance: none;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff, #f7faf6);
+  color: var(--text);
+  padding: 9px 13px;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.8), 0 4px 12px rgba(24,48,30,0.04);
+}
+
+button.active {
+  color: white !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 10px 22px rgba(50,166,74,0.26) !important;
+}
+
+button.reset {
   color: white;
+  border: 0;
+  background: linear-gradient(135deg, #ff665c, #df3c34);
+  box-shadow: 0 10px 22px rgba(239,77,66,0.22);
 }
 
-main {
-  flex: 1;
-  overflow-y: auto;
+button:active {
+  transform: scale(0.985);
 }
 
-.settimana {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
+/* Navigazione principale */
 
-.week-summary {
+#root > div:first-of-type {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1rem;
-  margin-bottom: 1rem;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 8px 0 14px;
 }
 
-.week-summary div,
-.filter-buttons {
-  background: var(--bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.75rem 1rem;
+#root > div:first-of-type button {
+  min-height: 46px;
+  font-size: 1rem;
 }
 
-.week-summary div {
-  text-align: center;
+/* Statistiche */
+
+#root > div:nth-of-type(2) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 9px;
+  margin: 0 0 12px;
 }
 
-.filter-buttons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-.filter-buttons button {
-  flex: 1;
-  min-width: 110px;
-}
-
-.filter-buttons button.active {
-  background: var(--accent);
-  color: white;
-}
-
-.giorno {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  overflow: hidden;
-  background: var(--bg);
+#root > div:nth-of-type(2) > div {
+  min-height: 76px;
+  padding: 12px;
+  border: 1px solid var(--line) !important;
+  border-radius: 20px !important;
+  background: var(--panel);
   box-shadow: var(--shadow);
 }
 
-.day-toggle {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: none;
-  background: transparent;
-  font-size: 1rem;
-  padding: 1rem;
-  text-align: left;
-  cursor: pointer;
+#root > div:nth-of-type(2) strong,
+#root > div:nth-of-type(2) b {
+  display: block;
+  margin-bottom: 8px;
+  color: #334338;
+  font-size: 0.82rem;
+  line-height: 1.12;
+  font-weight: 850;
 }
 
-.giorno h2 {
-  margin-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 0.5rem;
+#root > div:nth-of-type(2) div div,
+#root > div:nth-of-type(2) p {
+  margin: 0;
+  color: #142017;
+  font-size: 1.38rem;
+  line-height: 1;
+  font-weight: 900;
 }
+
+/* Filtro generale */
+
+#root > div:nth-of-type(3) {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  margin: 0 0 14px;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.74);
+  scrollbar-width: none;
+}
+
+#root > div:nth-of-type(3)::-webkit-scrollbar {
+  display: none;
+}
+
+#root > div:nth-of-type(3) button {
+  flex: 0 0 auto;
+  min-width: 112px;
+  min-height: 42px;
+}
+
+/* Settimana / giorni */
+
+.settimana {
+  display: grid;
+  gap: 11px;
+}
+
+.settimana > div {
+  overflow: hidden;
+  border: 1px solid var(--line) !important;
+  border-radius: 24px !important;
+  background: var(--panel);
+  box-shadow: var(--shadow);
+}
+
+.settimana > div > button {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 8px 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 64px !important;
+  padding: 15px 16px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text) !important;
+  font-size: 1.05rem !important;
+  font-weight: 900 !important;
+  text-align: left !important;
+}
+
+.settimana > div > button > span:nth-child(2) {
+  justify-self: end;
+  color: #263629;
+  font-size: 0.96rem;
+}
+
+.day-progress {
+  grid-column: 1 / -1;
+  height: 9px;
+  width: 100%;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: rgba(35, 123, 52, 0.10);
+  overflow: hidden;
+}
+
+.day-progress span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+/* Fasce giornata */
+
+.time-filter {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px 10px 4px;
+  scrollbar-width: none;
+}
+
+.time-filter::-webkit-scrollbar {
+  display: none;
+}
+
+.time-filter button {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+
+.time-filter button.active {
+  color: white !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+}
+
+/* Compiti */
 
 .compiti {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  padding: 2px 0 12px;
 }
 
 .compito {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.75rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: white;
+  position: relative;
+  overflow: hidden;
+  margin: 8px 10px !important;
+  padding: 13px !important;
+  border: 1px solid var(--cream-line) !important;
+  border-radius: 20px !important;
+  background: linear-gradient(180deg, rgba(255,250,241,0.98), rgba(255,246,232,0.94)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7) !important;
 }
 
-.compito.assigned {
-  background: #fffdf7;
-}
-
-.compito.unassigned {
-  background: #fff6f0;
-  border-color: #f2c6ad;
-}
-
-.compito.fatto {
-  background: #e6f8ea;
-  border-color: #7cc47f;
+.compito::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14px;
+  bottom: 14px;
+  width: 4px;
+  border-radius: 0 999px 999px 0;
+  background: var(--amber);
 }
 
 .compito-top {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .compito-name {
-  font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 0;
+  color: #223025;
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  overflow-wrap: anywhere;
 }
 
-.compito-punti,
-.compito-stato,
-.compito-assegnato {
-  font-size: 0.95rem;
+.compito-punti {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: rgba(50,166,74,0.13);
+  color: var(--green-dark);
+  font-size: 0.8rem;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .compito-meta {
   display: flex;
   justify-content: space-between;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 0.88rem;
+}
+
+.compito-stato {
+  flex: 0 0 auto;
+  color: #354338;
+  font-weight: 900;
 }
 
 .compito-actions {
   display: flex;
-  gap: 0.75rem;
-  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 11px;
   align-items: center;
 }
 
-.select-disabled {
-  opacity: 0.6;
+.compito-actions select {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.compito-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.compito-actions button {
+  flex: 0 0 auto;
+  min-width: 88px;
 }
 
-.compito-header span {
-  flex: 1;
-}
-
-.compito button {
-  align-self: flex-end;
-}
-
-.classifica, .personale {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.classifica ul {
-  list-style: none;
-  padding: 0;
-}
-
-.classifica li {
-  padding: 0.5rem;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-}
-
-.persona-riepilogo {
-  margin-bottom: 1rem;
-  padding: 1rem;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--bg);
-}
-
-.persona-section {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.persona-section ul {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0 0 0;
-}
-
-.persona-section li {
-  margin-bottom: 0.5rem;
-}
-
-.reminder-item {
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  align-items: center;
-}
-
-.reminder-item button {
-  padding: 0.3rem 0.6rem;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  background: transparent;
-}
-
-.storico {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.storico-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.storico-entry {
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 1rem;
-  background: var(--bg);
-  box-shadow: var(--shadow);
-}
-
-.storico-meta {
-  margin-top: 0.5rem;
+select,
+input[type="date"] {
+  min-height: 40px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.96);
   color: var(--text);
-  font-size: 0.95rem;
+  padding: 8px 10px;
+  font: inherit;
 }
 
-.historic-balance {
-  margin-top: 1.5rem;
+.compito.fatto {
+  border-color: rgba(50,166,74,0.28) !important;
+  background: linear-gradient(180deg, rgba(235,250,239,0.98), rgba(224,246,229,0.94)) !important;
 }
 
-.balances-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
+.compito.fatto::before {
+  background: var(--green);
+}
+
+.compito.fatto .compito-stato {
+  color: var(--green-dark);
 }
 
 .empty-day {
-  padding: 1rem;
-  color: var(--text-h);
-  background: var(--accent-bg);
-  border-radius: 8px;
-}
-
-.storico-header {
-  margin-bottom: 1rem;
-}
-
-.storico-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 1rem;
-}
-
-.storico-entry ul {
-  list-style: none;
-  padding: 0;
-  margin: 0.5rem 0 0 0;
-}
-
-.storico-reset {
-  margin-top: 1rem;
-}
-
-footer {
+  margin: 10px;
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(250,250,247,0.82);
+  color: var(--muted);
   text-align: center;
-  margin-top: 2rem;
 }
 
-.reset {
-  background: #f44336;
-  color: white;
-  border: none;
+/* Controlli settimana */
+
+.week-controls {
+  display: grid;
+  gap: 10px;
+  margin-top: 16px;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--panel);
+  box-shadow: var(--shadow);
 }
 
-.reset:hover {
-  background: #d32f2f;
+.week-controls button {
+  min-height: 48px;
 }
 
-/* Mobile optimizations */
-@media (max-width: 768px) {
-  .app {
-    padding: 0.75rem;
-    width: 100%;
-    max-width: 100vw;
-    overflow-x: hidden;
+.week-start-control {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.week-start-control label {
+  grid-column: 1 / -1;
+  color: var(--text);
+  font-weight: 850;
+}
+
+.week-start-control input {
+  width: 100%;
+}
+
+/* Mobile piccoli */
+
+@media (max-width: 390px) {
+  #root {
+    padding-left: 9px;
+    padding-right: 9px;
   }
 
-  header {
-    margin-bottom: 1rem;
-  }
-
-  header h1 {
-    font-size: 2rem;
-    line-height: 1.1;
-  }
-
-  header p {
-    margin-bottom: 0.25rem;
-  }
-
-  .week-label {
-    font-size: 0.95rem;
-    margin-bottom: 0.75rem;
-  }
-
-  nav {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-    width: 100%;
-  }
-
-  nav button {
-    max-width: none;
-    width: 100%;
-    padding: 0.7rem 0.5rem;
-    font-size: 1rem;
-  }
-
-  .settimana {
-    gap: 0.75rem;
-  }
-
-  .week-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .week-summary div {
-    padding: 0.6rem 0.5rem;
-  }
-
-  .week-summary strong {
-    display: block;
-    font-size: 0.85rem;
-    line-height: 1.2;
-  }
-
-  .week-summary div div {
-    font-size: 1.2rem;
-    font-weight: 700;
-    padding: 0;
-    border: none;
-  }
-
-  .filter-buttons {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0.5rem;
-    padding: 0.5rem;
-  }
-
-  .filter-buttons button {
-    min-width: 0;
-    width: 100%;
-    padding: 0.65rem 0.4rem;
-    font-size: 0.95rem;
-  }
-
-  .giorno {
-    border-radius: 10px;
-  }
-
-  .day-toggle {
-    padding: 0.8rem;
-    font-size: 1rem;
-    font-weight: 700;
-  }
-
-  .compiti {
-    gap: 0.5rem;
-    padding: 0 0.5rem 0.5rem;
-  }
-
-  .compito {
-    gap: 0.35rem;
-    padding: 0.65rem;
-    border-radius: 10px;
-  }
-
-  .compito-top {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.5rem;
-    align-items: start;
-  }
-
-  .compito-name {
-    font-size: 0.98rem;
-    line-height: 1.25;
-  }
-
-  .compito-punti {
-    font-size: 0.9rem;
-    font-weight: 700;
-    white-space: nowrap;
-  }
-
-  .compito-meta {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.5rem;
-    font-size: 0.9rem;
+  h1 {
+    font-size: 2.35rem;
   }
 
   .compito-actions {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 0.5rem;
-    align-items: center;
+    flex-wrap: wrap;
   }
 
-  .compito-actions select {
-    width: 100%;
-    min-width: 0;
-    padding: 0.55rem;
-    font-size: 1rem;
+  .compito-actions select,
+  .compito-actions button {
+    flex: 1 1 100%;
+  }
+}
+
+/* === CASA ROSSI MOBILE FIRST FIX === */
+
+/* Correzione principale: .app NON deve diventare una griglia a due colonne */
+#root {
+  width: 100% !important;
+  max-width: 500px !important;
+  margin: 0 auto !important;
+  padding: 18px 14px 90px !important;
+}
+
+.app {
+  display: block !important;
+  width: 100% !important;
+  max-width: 500px !important;
+  margin: 0 auto !important;
+}
+
+/* Header */
+.app h1 {
+  margin: 8px 0 8px !important;
+  font-size: clamp(2.7rem, 12vw, 4.2rem) !important;
+  line-height: 0.9 !important;
+  letter-spacing: -0.065em !important;
+  font-weight: 950 !important;
+}
+
+.app > p {
+  margin: 4px 0 !important;
+  color: var(--muted) !important;
+  font-size: 1rem !important;
+}
+
+.app .week-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  margin: 12px 0 16px !important;
+  padding: 8px 13px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  color: #536255 !important;
+  font-size: 0.92rem !important;
+}
+
+.app .week-label::before {
+  content: "●";
+  color: var(--green);
+  font-size: 0.7rem;
+}
+
+/* Tab principali */
+.app > div:first-of-type {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  margin: 6px 0 16px !important;
+}
+
+.app > div:first-of-type button {
+  min-height: 50px !important;
+  border-radius: 18px !important;
+  font-size: 1.02rem !important;
+  font-weight: 900 !important;
+}
+
+/* Schermata settimana */
+.settimana {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+/* Card statistiche */
+.week-summary {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 26px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.week-summary > div {
+  min-height: 78px !important;
+  padding: 13px 12px !important;
+  border: 1px solid rgba(36, 65, 42, 0.12) !important;
+  border-radius: 20px !important;
+  background: linear-gradient(180deg, #ffffff, #f8fbf7) !important;
+  color: #142017 !important;
+  font-size: 1.65rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9) !important;
+}
+
+.week-summary strong {
+  display: block !important;
+  margin-bottom: 10px !important;
+  color: #667369 !important;
+  font-size: 0.76rem !important;
+  line-height: 1.1 !important;
+  font-weight: 850 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* Filtri generali */
+.filter-buttons {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  margin: 0 !important;
+  padding: 10px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 24px !important;
+  background: rgba(255,255,255,0.82) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.filter-buttons button {
+  min-height: 48px !important;
+  border-radius: 17px !important;
+  font-size: 0.98rem !important;
+  font-weight: 900 !important;
+}
+
+.filter-buttons button.active {
+  transform: translateY(-1px);
+}
+
+/* Card giorno */
+.giorno {
+  overflow: hidden !important;
+  width: 100% !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 26px !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.giorno .day-toggle {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 8px 12px !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-height: 68px !important;
+  padding: 16px 18px 10px !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--text) !important;
+  text-align: left !important;
+}
+
+.giorno .day-toggle span:first-child {
+  font-size: 1.12rem !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.02em !important;
+}
+
+.giorno .day-toggle span:last-child {
+  justify-self: end !important;
+  color: #263629 !important;
+  font-size: 0.98rem !important;
+  font-weight: 950 !important;
+}
+
+/* Barra progresso ben visibile anche a zero */
+.day-progress {
+  height: 12px !important;
+  width: auto !important;
+  margin: 0 18px 18px !important;
+  border-radius: 999px !important;
+  background: #dfece2 !important;
+  box-shadow: inset 0 1px 2px rgba(24, 48, 30, 0.10) !important;
+  overflow: hidden !important;
+}
+
+.day-progress span {
+  display: block !important;
+  height: 100% !important;
+  border-radius: inherit !important;
+  background: linear-gradient(90deg, #53c264, var(--green-dark)) !important;
+  transition: width 0.35s ease !important;
+}
+
+/* Filtro fascia giornata dentro i giorni aperti */
+.time-filter {
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+  padding: 12px 14px 6px !important;
+  scrollbar-width: none !important;
+}
+
+.time-filter::-webkit-scrollbar {
+  display: none !important;
+}
+
+.time-filter button {
+  flex: 0 0 auto !important;
+  min-height: 40px !important;
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  font-size: 0.9rem !important;
+  font-weight: 900 !important;
+}
+
+/* Compiti */
+.compiti {
+  padding: 4px 4px 14px !important;
+}
+
+.compito {
+  margin: 9px 10px !important;
+  padding: 14px !important;
+  border-radius: 21px !important;
+}
+
+.compito-actions {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 8px !important;
+}
+
+.compito-actions select {
+  min-height: 44px !important;
+  border-radius: 14px !important;
+}
+
+.compito-actions button {
+  min-height: 44px !important;
+  border-radius: 14px !important;
+  white-space: nowrap !important;
+}
+
+/* Controlli settimana */
+.week-controls {
+  display: grid !important;
+  gap: 10px !important;
+  padding: 14px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 26px !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+.week-controls .reset {
+  width: 100% !important;
+  min-height: 52px !important;
+  border-radius: 18px !important;
+}
+
+.week-start-control {
+  display: grid !important;
+  gap: 8px !important;
+  margin-top: 4px !important;
+}
+
+.week-start-control label {
+  color: var(--muted) !important;
+  font-size: 0.88rem !important;
+  font-weight: 850 !important;
+}
+
+.week-start-control input {
+  min-height: 44px !important;
+  padding: 9px 12px !important;
+  border: 1px solid var(--line) !important;
+  border-radius: 14px !important;
+  font: inherit !important;
+}
+
+/* Altre schermate: impedisce impaginazioni strane */
+.classifica,
+.personale,
+.storico {
+  display: grid !important;
+  gap: 12px !important;
+  width: 100% !important;
+}
+
+@media (min-width: 760px) {
+  #root {
+    max-width: 520px !important;
+  }
+
+  .app {
+    max-width: 520px !important;
+  }
+}
+
+/* === CASA ROSSI FILTER BUTTONS FIX === */
+
+.settimana > .filter-buttons {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  border-radius: 26px !important;
+}
+
+.settimana > .filter-buttons > button {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  width: 100% !important;
+  min-height: 54px !important;
+  padding: 13px 14px !important;
+  border: 1px solid rgba(36, 65, 42, 0.16) !important;
+  border-radius: 18px !important;
+  background: linear-gradient(180deg, #ffffff, #f6faf5) !important;
+  color: #172219 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 5px 12px rgba(24,48,30,0.05) !important;
+  font-size: 0.98rem !important;
+  font-weight: 950 !important;
+  text-align: left !important;
+}
+
+.settimana > .filter-buttons > button::after {
+  content: "›";
+  opacity: 0.45;
+  font-size: 1.15rem;
+  font-weight: 950;
+}
+
+.settimana > .filter-buttons > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.28),
+    0 12px 24px rgba(50,166,74,0.30) !important;
+  transform: translateY(-1px);
+}
+
+.settimana > .filter-buttons > button.active::after {
+  content: "✓";
+  opacity: 1;
+}
+
+/* Tab principali: desktop in riga, iPhone in 2x2 */
+.app header nav,
+.app > div:first-of-type {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 9px !important;
+  margin: 8px 0 16px !important;
+}
+
+.app header nav button,
+.app > div:first-of-type > button {
+  min-height: 48px !important;
+  padding: 9px 10px !important;
+  border-radius: 17px !important;
+  font-size: 0.95rem !important;
+  font-weight: 950 !important;
+}
+
+@media (max-width: 480px) {
+  .app header nav,
+  .app > div:first-of-type {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+
+/* === CASA ROSSI FILTER COUNTS + WEEK CONTROLS FIX === */
+
+.settimana > .filter-buttons > button {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.settimana > .filter-buttons > button::after {
+  content: none !important;
+}
+
+.filter-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 28px;
+  padding: 0 9px;
+  border-radius: 999px;
+  background: rgba(35, 123, 52, 0.12);
+  color: var(--green-dark);
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.filter-buttons button.active .filter-count {
+  background: rgba(255,255,255,0.24);
+  color: #ffffff;
+}
+
+.unassigned-alert {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 15px 16px;
+  border: 1px solid rgba(255, 181, 71, 0.45);
+  border-radius: 24px;
+  background: linear-gradient(180deg, #fff8ec, #fff3dc);
+  box-shadow: var(--shadow);
+}
+
+.unassigned-alert-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: rgba(255, 181, 71, 0.20);
+  font-size: 1.15rem;
+}
+
+.unassigned-alert strong {
+  display: block;
+  color: #1d2b20;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.unassigned-alert p {
+  margin: 5px 0 0;
+  color: #667369;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+/* Ripristina i pulsanti veri nei controlli settimana */
+.settimana .week-controls {
+  padding: 18px !important;
+  gap: 12px !important;
+}
+
+.settimana .week-controls > button.reset {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 56px !important;
+  padding: 13px 16px !important;
+  border: 0 !important;
+  border-radius: 19px !important;
+  background: linear-gradient(135deg, #ff665c, #df3c34) !important;
+  color: #ffffff !important;
+  box-shadow: 0 12px 24px rgba(239,77,66,0.24) !important;
+  font-size: 1rem !important;
+  font-weight: 950 !important;
+  text-align: center !important;
+}
+
+.settimana .week-controls > button.reset:nth-of-type(2) {
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  box-shadow: 0 12px 24px rgba(23,34,25,0.18) !important;
+}
+
+.settimana .week-start-control {
+  margin-top: 8px !important;
+}
+
+.settimana .week-start-control label {
+  margin-bottom: 2px !important;
+}
+
+
+/* === CASA ROSSI MISSION CONSOLE === */
+
+.mission-console {
+  position: relative;
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid rgba(36, 65, 42, 0.16);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 18% 0%, rgba(83, 194, 100, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.94), rgba(246,250,245,0.92));
+  box-shadow: var(--shadow);
+}
+
+.mission-console::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(90deg, transparent, rgba(255,255,255,0.38), transparent);
+  transform: translateX(-120%);
+  animation: mission-gloss 4.5s ease-in-out infinite;
+}
+
+@keyframes mission-gloss {
+  0%, 62% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+.mission-head {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: flex-start;
+  z-index: 1;
+}
+
+.mission-eyebrow {
+  display: block;
+  margin-bottom: 4px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.mission-head strong {
+  display: block;
+  color: #142017;
+  font-size: 1.25rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.03em;
+}
+
+.mission-percent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 70px;
+  height: 54px;
+  padding: 0 14px;
+  border-radius: 20px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1.25rem;
+  font-weight: 950;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 12px 22px rgba(20,32,23,0.16);
+}
+
+.mission-track {
+  position: relative;
+  z-index: 1;
+  height: 16px;
+  margin: 18px 0 14px;
+  border-radius: 999px;
+  background: #dfece2;
+  box-shadow: inset 0 2px 4px rgba(24, 48, 30, 0.12);
+  overflow: hidden;
+}
+
+.mission-track span {
+  display: block;
+  height: 100%;
+  min-width: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  box-shadow: 0 0 18px rgba(50,166,74,0.36);
+  transition: width 0.5s ease;
+}
+
+.mission-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.mission-chip {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    "led number"
+    "led label";
+  align-items: center;
+  column-gap: 8px;
+  min-height: 58px;
+  padding: 10px;
+  border: 1px solid rgba(36, 65, 42, 0.12);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.72);
+}
+
+.mission-led {
+  grid-area: led;
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  box-shadow: 0 0 0 5px rgba(35,123,52,0.08), 0 0 14px rgba(35,123,52,0.25);
+}
+
+.led-green {
+  background: #32a64a;
+}
+
+.led-amber {
+  background: #ffb547;
+  box-shadow: 0 0 0 5px rgba(255,181,71,0.12), 0 0 14px rgba(255,181,71,0.32);
+}
+
+.led-red {
+  background: #ef453d;
+  box-shadow: 0 0 0 5px rgba(239,69,61,0.10), 0 0 14px rgba(239,69,61,0.28);
+}
+
+.mission-chip b {
+  grid-area: number;
+  color: #142017;
+  font-size: 1.05rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.mission-chip small {
+  grid-area: label;
+  color: #6a766c;
+  font-size: 0.72rem;
+  font-weight: 850;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 430px) {
+  .mission-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mission-chip {
+    grid-template-columns: auto auto 1fr;
+    grid-template-areas: "led number label";
+    justify-content: start;
+  }
+
+  .mission-chip small {
+    align-self: center;
+  }
+}
+
+
+/* === CASA ROSSI DAY CONTROLLER CARDS === */
+
+.giorno {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.giorno.expanded {
+  border-color: rgba(50, 166, 74, 0.36) !important;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.14), transparent 34%),
+    rgba(255, 255, 255, 0.95) !important;
+  box-shadow:
+    0 18px 36px rgba(27, 52, 34, 0.14),
+    0 0 0 4px rgba(50, 166, 74, 0.07) !important;
+  transform: translateY(-1px);
+}
+
+.giorno .day-toggle {
+  grid-template-columns: 1fr auto !important;
+  padding: 18px 20px 10px !important;
+}
+
+.day-main {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.day-title-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.day-name {
+  color: #142017;
+  font-size: 1.22rem;
+  font-weight: 950;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.day-subtitle {
+  color: #334338;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.day-state {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.day-state.todo {
+  background: rgba(35, 123, 52, 0.10);
+  color: #3d4b40;
+}
+
+.day-state.progress {
+  background: rgba(255, 181, 71, 0.18);
+  color: #8a5b00;
+}
+
+.day-state.done {
+  background: rgba(50, 166, 74, 0.16);
+  color: var(--green-dark);
+}
+
+.day-score {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 8px;
+  align-items: center;
+  justify-content: end;
+}
+
+.day-score strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 58px;
+  height: 42px;
+  padding: 0 12px;
+  border-radius: 16px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 950;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 10px 20px rgba(20,32,23,0.12);
+}
+
+.day-open-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(35, 123, 52, 0.10);
+  color: var(--green-dark);
+  font-size: 1.35rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.giorno.expanded .day-open-indicator {
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+  color: #ffffff;
+}
+
+.giorno.expanded .day-progress {
+  background: #d8eadc !important;
+}
+
+@media (max-width: 430px) {
+  .day-title-row {
+    flex-wrap: wrap;
+  }
+
+  .day-score strong {
+    min-width: 52px;
+  }
+}
+
+
+/* === CASA ROSSI TASK CONTROLLER CARDS === */
+
+.compito {
+  position: relative !important;
+  display: grid !important;
+  gap: 12px !important;
+  padding: 16px !important;
+  border-width: 2px !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.85),
+    0 10px 22px rgba(34, 48, 37, 0.06) !important;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
+}
+
+.compito:active {
+  transform: scale(0.992);
+}
+
+.compito.unassigned {
+  border-color: rgba(255, 181, 71, 0.78) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255, 181, 71, 0.18), transparent 34%),
+    linear-gradient(180deg, #fffaf1, #fff5e6) !important;
+}
+
+.compito.assigned {
+  border-color: rgba(50, 166, 74, 0.48) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(83, 194, 100, 0.17), transparent 34%),
+    linear-gradient(180deg, #f7fff8, #eef9f0) !important;
+}
+
+.compito.fatto {
+  border-color: rgba(50, 166, 74, 0.85) !important;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(83, 194, 100, 0.28), transparent 34%),
+    linear-gradient(180deg, #f3fff4, #e8f8eb) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 14px 28px rgba(50, 166, 74, 0.12) !important;
+}
+
+.compito::before {
+  top: 16px !important;
+  bottom: 16px !important;
+  width: 5px !important;
+}
+
+.compito.unassigned::before {
+  background: linear-gradient(180deg, #ffcf75, #ff9f2f) !important;
+}
+
+.compito.assigned::before {
+  background: linear-gradient(180deg, #53c264, var(--green-dark)) !important;
+}
+
+.compito.fatto::before {
+  background: linear-gradient(180deg, #32a64a, #116b27) !important;
+}
+
+.compito-top {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: start !important;
+  gap: 12px !important;
+}
+
+.compito-name {
+  font-size: 1.06rem !important;
+  line-height: 1.15 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.compito.fatto .compito-name {
+  color: var(--green-dark) !important;
+}
+
+.compito.fatto .compito-name::before {
+  content: "✓ ";
+  font-weight: 950;
+}
+
+.compito-punti {
+  min-width: 54px !important;
+  min-height: 34px !important;
+  padding: 6px 11px !important;
+  border-radius: 999px !important;
+  background: rgba(50, 166, 74, 0.14) !important;
+  color: var(--green-dark) !important;
+  font-size: 0.88rem !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.75) !important;
+}
+
+.compito-meta {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-top: 0 !important;
+}
+
+.compito-assegnato {
+  display: inline-flex !important;
+  align-items: center !important;
+  min-height: 30px !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  padding: 5px 10px !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.7) !important;
+  color: #667369 !important;
+  font-size: 0.86rem !important;
+  font-weight: 850 !important;
+}
+
+.compito.assigned .compito-assegnato,
+.compito.fatto .compito-assegnato {
+  background: rgba(50, 166, 74, 0.13) !important;
+  color: var(--green-dark) !important;
+}
+
+.compito-stato {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 30px !important;
+  padding: 5px 11px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 181, 71, 0.18) !important;
+  color: #7c5200 !important;
+  font-size: 0.86rem !important;
+  font-weight: 950 !important;
+}
+
+.compito.fatto .compito-stato {
+  background: rgba(50, 166, 74, 0.16) !important;
+  color: var(--green-dark) !important;
+}
+
+.compito-actions {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  gap: 10px !important;
+  margin-top: 0 !important;
+}
+
+.compito-actions select {
+  width: 100% !important;
+  min-height: 48px !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(36, 65, 42, 0.18) !important;
+  border-radius: 16px !important;
+  background: rgba(255,255,255,0.86) !important;
+  color: #172219 !important;
+  font-size: 1rem !important;
+  font-weight: 750 !important;
+  box-shadow: inset 0 1px 2px rgba(24, 48, 30, 0.06) !important;
+}
+
+.compito-actions button {
+  min-width: 92px !important;
+  min-height: 48px !important;
+  padding: 8px 16px !important;
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 17px !important;
+  background:
+    linear-gradient(180deg, #ffffff, #f4faf5) !important;
+  color: #172219 !important;
+  font-size: 1rem !important;
+  font-weight: 950 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 7px 14px rgba(24, 48, 30, 0.06) !important;
+}
+
+.compito-actions button:hover {
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.compito.fatto .compito-actions button {
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 10px 20px rgba(50,166,74,0.22) !important;
+}
+
+.compito.fatto .compito-actions button::before {
+  content: "✓ ";
+}
+
+.compito.fatto {
+  animation: task-complete-pop 0.28s ease;
+}
+
+@keyframes task-complete-pop {
+  0% {
+    transform: scale(0.985);
+  }
+  70% {
+    transform: scale(1.012);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@media (max-width: 430px) {
+  .compito-actions {
+    grid-template-columns: 1fr !important;
   }
 
   .compito-actions button {
-    align-self: stretch;
-    padding: 0.55rem 0.8rem;
-    min-width: 82px;
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI ASSIGN BUTTON PANEL === */
+
+.compito-actions {
+  grid-template-columns: 1fr auto !important;
+  align-items: stretch !important;
+}
+
+.assign-panel {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  min-width: 0;
+  padding: 3px;
+  border: 1px solid rgba(36, 65, 42, 0.14);
+  border-radius: 18px;
+  background: rgba(255,255,255,0.62);
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.06);
+  scrollbar-width: none;
+}
+
+.assign-panel::-webkit-scrollbar {
+  display: none;
+}
+
+.assign-panel button {
+  flex: 0 0 auto !important;
+  min-width: auto !important;
+  min-height: 42px !important;
+  padding: 8px 12px !important;
+  border: 1px solid rgba(36, 65, 42, 0.12) !important;
+  border-radius: 15px !important;
+  background: rgba(255,255,255,0.82) !important;
+  color: #415044 !important;
+  box-shadow: none !important;
+  font-size: 0.88rem !important;
+  font-weight: 900 !important;
+  white-space: nowrap !important;
+}
+
+.assign-panel button.active {
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  border-color: transparent !important;
+  color: #ffffff !important;
+  box-shadow: 0 8px 16px rgba(50,166,74,0.22) !important;
+}
+
+.assign-panel button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.compito-actions > button {
+  align-self: stretch !important;
+}
+
+@media (max-width: 430px) {
+  .compito-actions {
+    grid-template-columns: 1fr !important;
   }
 
-  .compito button {
-    align-self: auto;
+  .assign-panel {
+    width: 100%;
+  }
+}
+
+
+/* === CASA ROSSI CLASSIFICA SCOREBOARD === */
+
+.screen-title-card,
+.dashboard-panel,
+.leaderboard-console {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.13), transparent 34%),
+    rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+}
+
+.screen-title-card {
+  padding: 20px;
+}
+
+.screen-eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.screen-title-card h2,
+.panel-title-row h2 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.screen-title-card p {
+  margin: 8px 0 0;
+  color: #667369;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+.leaderboard-console {
+  padding: 18px;
+}
+
+.leaderboard-head,
+.panel-title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.leaderboard-head strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.leaderboard-total,
+.quota-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: 17px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 950;
+  white-space: nowrap;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.14);
+}
+
+.quota-pill {
+  background: rgba(35,123,52,0.11);
+  color: var(--green-dark);
+  box-shadow: none;
+}
+
+.leaderboard-list {
+  display: grid;
+  gap: 10px;
+}
+
+.rank-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  min-height: 76px;
+  padding: 13px;
+  border: 1px solid rgba(36,65,42,0.13);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f7faf6);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
+}
+
+.rank-card.rank-1 {
+  border-color: rgba(255,181,71,0.58);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,181,71,0.20), transparent 34%),
+    linear-gradient(180deg, #fffaf0, #fff5e3);
+}
+
+.rank-medal {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 17px;
+  background: rgba(255,255,255,0.7);
+  font-size: 1.45rem;
+}
+
+.rank-info {
+  min-width: 0;
+}
+
+.rank-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: baseline;
+  margin-bottom: 10px;
+}
+
+.rank-top strong {
+  color: #142017;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.rank-top span {
+  color: #263629;
+  font-size: 0.94rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.rank-track {
+  height: 11px;
+  border-radius: 999px;
+  background: #dfece2;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.10);
+}
+
+.rank-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+.dashboard-panel {
+  padding: 18px;
+}
+
+.empty-state-card {
+  padding: 16px;
+  border: 1px dashed rgba(36,65,42,0.20);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.62);
+}
+
+.empty-state-card strong {
+  display: block;
+  color: #142017;
+  font-weight: 950;
+}
+
+.empty-state-card p {
+  margin: 6px 0 0;
+  color: #667369;
+}
+
+.balance-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.balance-card {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.13);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8fbf7);
+}
+
+.balance-card.credit {
+  border-color: rgba(50,166,74,0.28);
+}
+
+.balance-card.debit {
+  border-color: rgba(239,69,61,0.25);
+}
+
+.balance-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.balance-top strong {
+  color: #142017;
+  font-size: 1.05rem;
+  font-weight: 950;
+}
+
+.balance-top span {
+  color: #142017;
+  font-size: 1.25rem;
+  font-weight: 950;
+}
+
+.balance-card.credit .balance-top span {
+  color: var(--green-dark);
+}
+
+.balance-card.debit .balance-top span {
+  color: var(--red);
+}
+
+.balance-card small {
+  display: inline-flex;
+  margin-top: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: #415044;
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.balance-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.balance-meta span {
+  display: inline-flex;
+  padding: 6px 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.75);
+  color: #667369;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+@media (max-width: 430px) {
+  .leaderboard-head,
+  .panel-title-row {
+    flex-direction: column;
   }
 
-  .classifica,
-  .personale {
-    max-width: none;
+  .leaderboard-total,
+  .quota-pill {
+    width: 100%;
+  }
+}
+
+
+/* === CASA ROSSI PERSONALE DASHBOARD === */
+
+.people-dashboard {
+  display: grid;
+  gap: 14px;
+}
+
+.person-card {
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.13), transparent 34%),
+    rgba(255,255,255,0.93);
+  box-shadow: var(--shadow);
+}
+
+.person-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.person-head h3 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.person-percent {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 50px;
+  padding: 0 13px;
+  border-radius: 18px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1.08rem;
+  font-weight: 950;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.14);
+}
+
+.person-track {
+  height: 14px;
+  margin: 16px 0 14px;
+  border-radius: 999px;
+  background: #dfece2;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.10);
+}
+
+.person-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+.person-kpis {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 14px;
+}
+
+.person-kpis div {
+  min-height: 72px;
+  padding: 12px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+}
+
+.person-kpis strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.person-kpis span {
+  display: block;
+  margin-top: 6px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.personal-sections {
+  display: grid;
+  gap: 10px;
+}
+
+.personal-panel {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.13);
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffffff, #f8fbf7);
+}
+
+.personal-panel.todo {
+  border-color: rgba(255,181,71,0.42);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,181,71,0.15), transparent 34%),
+    linear-gradient(180deg, #fffaf0, #fff6e8);
+}
+
+.personal-panel.done {
+  border-color: rgba(50,166,74,0.28);
+}
+
+.personal-panel.reminder {
+  border-color: rgba(50,166,74,0.20);
+}
+
+.personal-panel > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #142017;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.personal-panel ul {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.personal-panel li {
+  padding: 10px 11px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.72);
+  color: #334338;
+  font-size: 0.93rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.reminder-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.reminder-item button {
+  min-height: 38px;
+  padding: 7px 12px;
+  border-radius: 14px;
+  font-size: 0.86rem;
+  font-weight: 950;
+}
+
+@media (max-width: 430px) {
+  .person-head {
+    flex-direction: column;
+  }
+
+  .person-percent {
     width: 100%;
   }
 
-  .persona-riepilogo {
-    padding: 0.75rem;
-  }
-
-  .persona-section {
+  .person-kpis {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
   }
 
   .reminder-item {
-    align-items: flex-start;
-  }
-
-  .reminder-item button {
-    flex-shrink: 0;
-  }
-
-  .storico-grid,
-  .balances-grid {
     grid-template-columns: 1fr;
   }
 
-  .storico-entry {
-    padding: 0.75rem;
-  }
-
-  .storico-reset,
-  .reset {
+  .reminder-item button {
     width: 100%;
-    max-width: 360px;
-    margin-left: auto;
-    margin-right: auto;
-    padding: 0.75rem 1rem;
   }
 }
+
+
+/* === CASA ROSSI STORICO TIMELINE === */
+
+.storico > h2 {
+  display: none;
+}
+
+.storico > p {
+  padding: 18px;
+  border: 1px dashed rgba(36,65,42,0.22);
+  border-radius: 24px;
+  background: rgba(255,255,255,0.82);
+  color: #667369;
+  font-weight: 850;
+  box-shadow: var(--shadow);
+}
+
+.storico::before {
+  content: "Archivio settimane";
+  display: block;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(83, 194, 100, 0.13), transparent 34%),
+    rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.storico::after {
+  content: "Timeline delle settimane chiuse, con classifica finale, compiti e reminder completati.";
+  display: block;
+  margin-top: -22px;
+  padding: 0 20px 18px;
+  color: #667369;
+  font-size: 0.96rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.storico-list {
+  position: relative;
+  display: grid;
+  gap: 14px;
+}
+
+.storico-list::before {
+  content: "";
+  position: absolute;
+  left: 20px;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.16);
+}
+
+.storico-entry {
+  position: relative;
+  overflow: hidden;
+  margin-left: 26px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(255,181,71,0.14), transparent 32%),
+    linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248,251,247,0.94));
+  box-shadow: var(--shadow);
+}
+
+.storico-entry::before {
+  content: "";
+  position: absolute;
+  left: -33px;
+  top: 24px;
+  width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: var(--green);
+  box-shadow:
+    0 0 0 7px rgba(50,166,74,0.14),
+    0 0 18px rgba(50,166,74,0.28);
+}
+
+.storico-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.storico-header h3 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.24rem;
+  line-height: 1.08;
+  font-weight: 950;
+  letter-spacing: -0.035em;
+}
+
+.storico-meta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: #536255;
+  font-size: 0.78rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.storico-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 10px !important;
+}
+
+.storico-grid > div {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.76);
+}
+
+.storico-grid strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #142017;
+  font-size: 0.95rem;
+  font-weight: 950;
+}
+
+.storico-grid ul {
+  display: grid;
+  gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.storico-grid li {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 9px 10px;
+  border-radius: 15px;
+  background: rgba(255,255,255,0.78);
+  color: #334338;
+  font-size: 0.9rem;
+  font-weight: 850;
+  line-height: 1.25;
+}
+
+.storico-reset {
+  width: 100% !important;
+  min-height: 54px !important;
+  margin-top: 4px !important;
+  border-radius: 19px !important;
+  background: linear-gradient(135deg, #ff665c, #df3c34) !important;
+  color: #ffffff !important;
+  font-weight: 950 !important;
+  box-shadow: 0 12px 24px rgba(239,77,66,0.24) !important;
+}
+
+@media (max-width: 430px) {
+  .storico-entry {
+    margin-left: 18px;
+  }
+
+  .storico-header {
+    flex-direction: column;
+  }
+
+  .storico-meta {
+    white-space: normal;
+  }
+}
+
+
+/* === CASA ROSSI STORICO TITLE FIX === */
+
+.storico::before,
+.storico::after {
+  content: none !important;
+  display: none !important;
+}
+
+.legacy-storico-title {
+  display: none !important;
+}
+
+.storico-title-card {
+  margin-bottom: 0 !important;
+}
+
+
+/* === CASA ROSSI COMPACT MOBILE REFINEMENT === */
+
+@media (max-width: 520px) {
+  #root {
+    padding-top: 12px !important;
+  }
+
+  .screen-title-card,
+  .leaderboard-console,
+  .dashboard-panel,
+  .person-card,
+  .storico-entry,
+  .mission-console,
+  .week-summary,
+  .filter-buttons,
+  .unassigned-alert,
+  .week-controls {
+    border-radius: 24px !important;
+  }
+
+  .screen-title-card,
+  .person-card,
+  .dashboard-panel,
+  .leaderboard-console,
+  .mission-console {
+    padding: 16px !important;
+  }
+
+  .person-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .person-kpis div {
+    min-height: 62px !important;
+    padding: 10px !important;
+  }
+
+  .person-kpis strong {
+    font-size: 1.2rem !important;
+  }
+
+  .personal-panel {
+    padding: 12px !important;
+  }
+
+  .personal-panel li {
+    padding: 8px 10px !important;
+  }
+
+  .storico-entry {
+    padding: 16px !important;
+  }
+
+  .storico-grid > div {
+    padding: 12px !important;
+  }
+
+  .storico-grid li {
+    padding: 8px 10px !important;
+  }
+
+  .compito {
+    padding: 14px !important;
+    gap: 10px !important;
+  }
+
+  .assign-panel button {
+    min-height: 38px !important;
+    padding: 7px 10px !important;
+  }
+}
+
+
+/* === CASA ROSSI ASSIGN PANEL MOBILE GRID FIX === */
+
+@media (max-width: 520px) {
+  .assign-panel {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    overflow-x: visible !important;
+    width: 100% !important;
+    padding: 5px !important;
+  }
+
+  .assign-panel button {
+    width: auto !important;
+    min-width: 0 !important;
+    flex: initial !important;
+    justify-content: center !important;
+    min-height: 42px !important;
+    padding: 8px 9px !important;
+    font-size: 0.86rem !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  .compito-actions {
+    grid-template-columns: 1fr !important;
+  }
+
+  .compito-actions > button {
+    width: 100% !important;
+    min-height: 48px !important;
+  }
+}
+
+
+/* === CASA ROSSI STICKY MAIN TABS === */
+
+.app > div:first-of-type {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 20 !important;
+  padding: 8px 0 !important;
+  margin-top: 8px !important;
+  margin-bottom: 14px !important;
+  background:
+    linear-gradient(180deg, rgba(251,252,248,0.96), rgba(251,252,248,0.80));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+
+@media (max-width: 520px) {
+  .app > div:first-of-type {
+    top: env(safe-area-inset-top, 0px) !important;
+  }
+
+  .app > div:first-of-type button {
+    min-height: 44px !important;
+    font-size: 0.9rem !important;
+    border-radius: 16px !important;
+  }
+}
+
+/* === CASA ROSSI AUTO ASSIGN BUTTON === */
+
+.unassigned-auto-button {
+  margin-top: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(50,166,74,0.22) !important;
+}
+
+@media (max-width: 520px) {
+  .unassigned-alert {
+    grid-template-columns: 1fr !important;
+  }
+
+  .unassigned-alert-icon {
+    margin-bottom: -4px;
+  }
+
+  .unassigned-auto-button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI PERSONAL TASK ACTIONS === */
+
+.personal-task-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.personal-task-item span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.personal-task-item button {
+  min-height: 38px !important;
+  padding: 7px 12px !important;
+  border-radius: 14px !important;
+  font-size: 0.86rem !important;
+  font-weight: 950 !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 16px rgba(50,166,74,0.20) !important;
+}
+
+.personal-task-item.done button {
+  background: linear-gradient(135deg, #ffffff, #f4faf5) !important;
+  color: #172219 !important;
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 7px 14px rgba(24,48,30,0.06) !important;
+}
+
+@media (max-width: 520px) {
+  .personal-task-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  .personal-task-item button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI RESTORE AUTO ASSIGN === */
+
+.restore-auto-alert {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 15px 16px;
+  border: 1px solid rgba(50, 166, 74, 0.32);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83, 194, 100, 0.16), transparent 34%),
+    linear-gradient(180deg, #f7fff8, #eef9f0);
+  box-shadow: var(--shadow);
+}
+
+.restore-auto-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: rgba(50, 166, 74, 0.16);
+  color: var(--green-dark);
+  font-size: 1.3rem;
+  font-weight: 950;
+}
+
+.restore-auto-alert strong {
+  display: block;
+  color: #1d2b20;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.restore-auto-alert p {
+  margin: 5px 0 0;
+  color: #667369;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.restore-auto-button {
+  margin-top: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
+}
+
+@media (max-width: 520px) {
+  .restore-auto-alert {
+    grid-template-columns: 1fr !important;
+  }
+
+  .restore-auto-button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI RESTORE AUTO ASSIGN WORKING === */
+
+.restore-auto-alert {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 15px 16px;
+  border: 1px solid rgba(50, 166, 74, 0.32);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83, 194, 100, 0.16), transparent 34%),
+    linear-gradient(180deg, #f7fff8, #eef9f0);
+  box-shadow: var(--shadow);
+}
+
+.restore-auto-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: rgba(50, 166, 74, 0.16);
+  color: var(--green-dark);
+  font-size: 1.3rem;
+  font-weight: 950;
+}
+
+.restore-auto-alert strong {
+  display: block;
+  color: #1d2b20;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.restore-auto-alert p {
+  margin: 5px 0 0;
+  color: #667369;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.restore-auto-button {
+  margin-top: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
+}
+
+@media (max-width: 520px) {
+  .restore-auto-alert {
+    grid-template-columns: 1fr !important;
+  }
+
+  .restore-auto-button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI SIMPLE RESTORE BUTTON === */
+
+.mission-restore-button {
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  min-height: 46px !important;
+  margin-top: 14px !important;
+  border: 0 !important;
+  border-radius: 17px !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
+}
+
+
+/* === CASA ROSSI WEEK DAY DETAIL VIEW === */
+
+.week-day-tabs {
+  position: sticky;
+  top: 72px;
+  z-index: 18;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(255,255,255,0.86);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.week-day-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.week-day-tabs button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  min-width: 58px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.week-day-tabs button:first-child {
+  min-width: 112px;
+}
+
+.week-day-tabs button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 10px 22px rgba(50,166,74,0.25) !important;
+}
+
+.day-detail-toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid rgba(50,166,74,0.28);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83,194,100,0.16), transparent 34%),
+    rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+}
+
+.day-detail-toolbar span {
+  display: block;
+  color: #6a766c;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.day-detail-toolbar strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.day-detail-toolbar button {
+  min-height: 44px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.giorno.selected-day {
+  scroll-margin-top: 150px;
+}
+
+.giorno.selected-day .day-toggle {
+  cursor: default;
+}
+
+@media (max-width: 520px) {
+  .week-day-tabs {
+    top: 64px;
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+
+  .week-day-tabs button {
+    min-width: 54px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+  .week-day-tabs button:first-child {
+    min-width: 104px;
+  }
+
+  .day-detail-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .day-detail-toolbar button {
+    width: 100%;
+  }
+}
+
+
+/* === CASA ROSSI WEEK DAY TABS POLISH === */
+
+/* La barra dei giorni deve sembrare un selettore compatto, non una card gigante */
+.week-day-tabs {
+  position: sticky !important;
+  top: 74px !important;
+  z-index: 18 !important;
+
+  display: flex !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+
+  padding: 7px !important;
+  margin: 2px 0 8px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08) !important;
+
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  scrollbar-width: none !important;
+}
+
+.week-day-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.week-day-tabs button {
+  flex: 0 0 auto !important;
+  min-width: auto !important;
+  min-height: 34px !important;
+  padding: 7px 11px !important;
+
+  border-radius: 999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+
+  box-shadow: none !important;
+}
+
+.week-day-tabs button:first-child {
+  min-width: auto !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+.week-day-tabs button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+/* La toolbar del giorno deve essere piccola */
+.day-detail-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+
+  padding: 10px 12px !important;
+  border-radius: 20px !important;
+}
+
+.day-detail-toolbar span {
+  font-size: 0.66rem !important;
+}
+
+.day-detail-toolbar strong {
+  font-size: 1.08rem !important;
+}
+
+.day-detail-toolbar button {
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: 14px !important;
+  font-size: 0.82rem !important;
+}
+
+/* Quando guardi un solo giorno, la card deve partire pulita */
+.giorno.selected-day {
+  margin-top: 4px !important;
+}
+
+@media (max-width: 520px) {
+  .week-day-tabs {
+    top: 8px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 6px !important;
+  }
+
+  .week-day-tabs button {
+    min-height: 32px !important;
+    padding: 6px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .week-day-tabs button:first-child {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .day-detail-toolbar {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .day-detail-toolbar button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI WEEK DAY TABS SPECIFIC FIX === */
+
+/* Vince sulle vecchie regole .settimana > div e .settimana > div > button */
+.settimana > .week-day-tabs {
+  position: sticky !important;
+  top: 8px !important;
+  z-index: 30 !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+
+  width: 100% !important;
+  min-height: auto !important;
+  overflow-x: auto !important;
+
+  margin: 0 0 10px !important;
+  padding: 6px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08) !important;
+
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  scrollbar-width: none !important;
+}
+
+.settimana > .week-day-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.settimana > .week-day-tabs > button {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+  min-width: 48px !important;
+  min-height: 34px !important;
+
+  padding: 7px 11px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #ffffff, #f6faf5) !important;
+  color: #172219 !important;
+
+  box-shadow: none !important;
+
+  font-size: 0.78rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.settimana > .week-day-tabs > button:first-child {
+  min-width: 94px !important;
+}
+
+.settimana > .week-day-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+/* Anche la toolbar deve vincere sulle regole vecchie delle card */
+.settimana > .day-detail-toolbar {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 10px !important;
+  align-items: center !important;
+
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  padding: 11px 12px !important;
+
+  border: 1px solid rgba(50,166,74,0.24) !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,0.88) !important;
+  box-shadow: 0 8px 18px rgba(20,32,23,0.07) !important;
+}
+
+.settimana > .day-detail-toolbar button {
+  width: auto !important;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: 14px !important;
+  font-size: 0.82rem !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+@media (max-width: 520px) {
+  .settimana > .week-day-tabs {
+    top: 6px !important;
+  }
+
+  .settimana > .week-day-tabs > button {
+    min-width: 44px !important;
+    min-height: 32px !important;
+    padding: 6px 9px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .settimana > .week-day-tabs > button:first-child {
+    min-width: 86px !important;
+  }
+
+  .settimana > .day-detail-toolbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  .settimana > .day-detail-toolbar button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI PERSONALE TABS DETAIL === */
+
+.personale > .people-tabs {
+  position: sticky;
+  top: 8px;
+  z-index: 30;
+
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+
+  padding: 6px;
+  margin: 0 0 10px;
+
+  border: 1px solid rgba(36, 65, 42, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.personale > .people-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.personale > .people-tabs > button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  min-width: 54px;
+  padding: 7px 12px;
+
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.personale > .people-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+/* In panoramica, le card persona diventano sintetiche */
+.person-card.person-summary-only .personal-sections {
+  display: none !important;
+}
+
+.person-card.person-summary-only {
+  cursor: default;
+}
+
+.person-card.selected-person {
+  border-color: rgba(50, 166, 74, 0.36) !important;
+  box-shadow:
+    0 18px 36px rgba(27, 52, 34, 0.14),
+    0 0 0 4px rgba(50, 166, 74, 0.07) !important;
+}
+
+@media (max-width: 520px) {
+  .personale > .people-tabs {
+    top: 6px;
+  }
+
+  .personale > .people-tabs > button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI CLICKABLE PERSON SUMMARY === */
+
+.person-card.person-summary-only {
+  cursor: pointer;
+}
+
+.person-card.person-summary-only:hover {
+  border-color: rgba(50, 166, 74, 0.34) !important;
+  box-shadow:
+    0 16px 32px rgba(27, 52, 34, 0.12),
+    0 0 0 4px rgba(50, 166, 74, 0.05) !important;
+  transform: translateY(-1px);
+}
+
+.person-card.person-summary-only:focus-visible {
+  outline: 3px solid rgba(50, 166, 74, 0.35);
+  outline-offset: 3px;
+}
+
+.person-card.person-summary-only::after {
+  content: "Apri dettaglio";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 12px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: var(--green-dark);
+  font-size: 0.78rem;
+  font-weight: 950;
+}
+
+
+/* === CASA ROSSI PERSON NAME TOGGLE === */
+
+.person-name-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 44px !important;
+  padding: 7px 14px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.72) !important;
+  color: #142017 !important;
+
+  font-size: 1.35rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.04em !important;
+  text-align: left !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 7px 14px rgba(24,48,30,0.05) !important;
+
+  cursor: pointer !important;
+}
+
+.person-name-button.active {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(50,166,74,0.24) !important;
+}
+
+.person-name-button.active::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-left: 9px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.person-name-button:focus-visible {
+  outline: 3px solid rgba(50,166,74,0.32);
+  outline-offset: 3px;
+}
+
+@media (max-width: 520px) {
+  .person-name-button {
+    min-height: 40px !important;
+    padding: 7px 12px !important;
+    font-size: 1.15rem !important;
+  }
+}
+
+
+/* === CASA ROSSI CLASSIFICA TABS DETAIL === */
+
+.classifica > .score-tabs {
+  position: sticky;
+  top: 8px;
+  z-index: 30;
+
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+
+  padding: 6px;
+  margin: 0 0 10px;
+
+  border: 1px solid rgba(36, 65, 42, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.classifica > .score-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.classifica > .score-tabs > button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  min-width: 54px;
+  padding: 7px 12px;
+
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.classifica > .score-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+@media (max-width: 520px) {
+  .classifica > .score-tabs {
+    top: 6px;
+  }
+
+  .classifica > .score-tabs > button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI SCORE NAME TOGGLE === */
+
+.score-name-button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 36px !important;
+  padding: 6px 11px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.72) !important;
+  color: #142017 !important;
+
+  font-size: 1rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.025em !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 6px 12px rgba(24,48,30,0.05) !important;
+
+  cursor: pointer !important;
+}
+
+.score-name-button.active {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.score-name-button.active::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 21px;
+  height: 21px;
+  margin-left: 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 950;
+}
+
+.score-name-button.balance {
+  font-size: 1.05rem !important;
+}
+
+.score-name-button:focus-visible {
+  outline: 3px solid rgba(50,166,74,0.32);
+  outline-offset: 3px;
+}
+
+
+/* === CASA ROSSI CLASSIFICA FOCUS PERSONA === */
+
+.score-focus-panel {
+  overflow: hidden;
+  padding: 18px;
+  border: 1px solid rgba(50,166,74,0.30);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83,194,100,0.18), transparent 34%),
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(241,249,243,0.94));
+  box-shadow:
+    0 18px 36px rgba(27,52,34,0.12),
+    0 0 0 4px rgba(50,166,74,0.06);
+}
+
+.score-focus-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.score-focus-head h2 {
+  margin: 0;
+  color: #142017;
+  font-size: 1.55rem;
+  line-height: 1;
+  font-weight: 950;
+  letter-spacing: -0.04em;
+}
+
+.focus-balance-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 72px;
+  height: 52px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: #142017;
+  color: #ffffff;
+  font-size: 1.18rem;
+  font-weight: 950;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.14);
+}
+
+.focus-balance-pill.credit {
+  background: linear-gradient(135deg, var(--green), var(--green-dark));
+}
+
+.focus-balance-pill.debit {
+  background: linear-gradient(135deg, #ff665c, #df3c34);
+}
+
+.focus-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 9px;
+  margin-bottom: 12px;
+}
+
+.focus-kpis div {
+  min-height: 74px;
+  padding: 12px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+}
+
+.focus-kpis strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.focus-kpis span {
+  display: block;
+  margin-top: 6px;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.focus-message {
+  margin-bottom: 14px;
+  padding: 13px 14px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.72);
+  color: #263629;
+  font-size: 0.95rem;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.focus-trend {
+  padding: 14px;
+  border: 1px solid rgba(36,65,42,0.12);
+  border-radius: 22px;
+  background: rgba(255,255,255,0.72);
+}
+
+.focus-trend > strong {
+  display: block;
+  margin-bottom: 10px;
+  color: #142017;
+  font-size: 1rem;
+  font-weight: 950;
+}
+
+.focus-trend-list {
+  display: grid;
+  gap: 9px;
+}
+
+.focus-trend-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 1.5fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 10px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.78);
+}
+
+.focus-trend-row span {
+  color: #334338;
+  font-size: 0.84rem;
+  font-weight: 900;
+}
+
+.focus-trend-row b {
+  color: #142017;
+  font-size: 0.88rem;
+  font-weight: 950;
+  white-space: nowrap;
+}
+
+.focus-trend-row small {
+  grid-column: 1 / -1;
+  color: #6a766c;
+  font-size: 0.78rem;
+  font-weight: 850;
+}
+
+.focus-trend-track {
+  height: 10px;
+  border-radius: 999px;
+  background: #dfece2;
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(24,48,30,0.10);
+}
+
+.focus-trend-track i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #53c264, var(--green-dark));
+  transition: width 0.4s ease;
+}
+
+@media (max-width: 520px) {
+  .score-focus-head {
+    flex-direction: column;
+  }
+
+  .focus-balance-pill {
+    width: 100%;
+  }
+
+  .focus-kpis {
+    grid-template-columns: 1fr;
+  }
+
+  .focus-trend-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* === CASA ROSSI STORICO TABS DETAIL === */
+
+.storico > .history-tabs {
+  position: sticky;
+  top: 8px;
+  z-index: 30;
+
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+
+  padding: 6px;
+  margin: 0 0 10px;
+
+  border: 1px solid rgba(36, 65, 42, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08);
+
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.storico > .history-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.storico > .history-tabs > button {
+  flex: 0 0 auto;
+  min-height: 34px;
+  min-width: 54px;
+  padding: 7px 12px;
+
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+  white-space: nowrap;
+
+  box-shadow: none !important;
+}
+
+.storico > .history-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+.storico-entry.history-summary-only {
+  cursor: pointer;
+}
+
+.storico-entry.history-summary-only .storico-grid {
+  display: none !important;
+}
+
+.storico-entry.history-summary-only::after {
+  content: "Apri dettaglio";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: var(--green-dark);
+  font-size: 0.8rem;
+  font-weight: 950;
+}
+
+.storico-entry.selected-history {
+  border-color: rgba(50,166,74,0.34) !important;
+  box-shadow:
+    0 18px 36px rgba(27, 52, 34, 0.14),
+    0 0 0 4px rgba(50, 166, 74, 0.07) !important;
+}
+
+.storico-entry.history-summary-only:hover {
+  border-color: rgba(50,166,74,0.30) !important;
+}
+
+@media (max-width: 520px) {
+  .storico > .history-tabs {
+    top: 6px;
+  }
+
+  .storico > .history-tabs > button {
+    min-height: 32px;
+    padding: 6px 10px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI STORICO CARD TOGGLE BACK === */
+
+.storico-entry.selected-history {
+  cursor: pointer;
+}
+
+.storico-entry.selected-history::after {
+  content: "Mostra tutte le settimane";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  margin-top: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(35,123,52,0.10);
+  color: var(--green-dark);
+  font-size: 0.8rem;
+  font-weight: 950;
+}
+
+
+/* === CASA ROSSI WEEK TAB ACTIVE X === */
+
+.settimana > .week-day-tabs > button {
+  gap: 7px !important;
+}
+
+.settimana > .week-day-tabs > button.active:not(:first-child)::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+
+/* === CASA ROSSI SELECTED DAY NAME PILL === */
+
+/* Quando un giorno è aperto, il nome nella card diventa un pill verde con X */
+.giorno.selected-day .day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 38px !important;
+  padding: 7px 13px !important;
+
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.giorno.selected-day .day-name::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* In dettaglio il badge "Da iniziare / In corso / Completato" si compatta accanto al nome */
+.giorno.selected-day .day-title-row {
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+/* Il meno a destra resta, ma più discreto: il segnale principale ora è la X sul nome */
+.giorno.selected-day .day-open-indicator {
+  opacity: 0.55 !important;
+}
+
+/* Su mobile teniamo il pill leggibile ma non enorme */
+@media (max-width: 520px) {
+  .giorno.selected-day .day-name {
+    min-height: 36px !important;
+    padding: 7px 12px !important;
+    font-size: 1rem !important;
+  }
+
+  .giorno.selected-day .day-name::after {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* === CASA ROSSI ACTIVE DAY NAME IN CARD === */
+
+.giorno .day-name.active-day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 38px !important;
+  padding: 7px 13px !important;
+
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.giorno .day-name.active-day-name::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.giorno.selected-day .day-title-row {
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+@media (max-width: 520px) {
+  .giorno .day-name.active-day-name {
+    min-height: 36px !important;
+    padding: 7px 12px !important;
+    font-size: 1rem !important;
+  }
+
+  .giorno .day-name.active-day-name::after {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+
+/* === CASA ROSSI UNIFORM ACTIVE TAB X === */
+
+/* Aggiunge la X sui tab selezionati, esclusi Tutti/Tutte/Settimana */
+.personale > .people-tabs > button,
+.classifica > .score-tabs > button,
+.storico > .history-tabs > button {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+}
+
+.personale > .people-tabs > button.active:not(:first-child)::after,
+.classifica > .score-tabs > button.active:not(:first-child)::after,
+.storico > .history-tabs > button.active:not(:first-child)::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* Su mobile la X resta compatta */
+@media (max-width: 520px) {
+  .personale > .people-tabs > button.active:not(:first-child)::after,
+  .classifica > .score-tabs > button.active:not(:first-child)::after,
+  .storico > .history-tabs > button.active:not(:first-child)::after {
+    width: 18px;
+    height: 18px;
+    font-size: 0.74rem;
+  }
+}
+
+
+/* === CASA ROSSI MAIN STICKY NAV + DAY NAME PILL === */
+
+/* Nasconde la vecchia nav dentro l'header: ora usiamo quella sticky fuori header */
+header > nav {
+  display: none !important;
+}
+
+/* Menu principale sempre visibile */
+.main-sticky-tabs {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 80 !important;
+
+  display: flex !important;
+  gap: 8px !important;
+  overflow-x: auto !important;
+
+  padding: 8px !important;
+  margin: 10px 0 14px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.90) !important;
+  box-shadow:
+    0 12px 24px rgba(20, 32, 23, 0.10),
+    inset 0 1px 0 rgba(255,255,255,0.85) !important;
+
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  scrollbar-width: none !important;
+}
+
+.main-sticky-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.main-sticky-tabs > button {
+  flex: 1 0 auto !important;
+  min-height: 44px !important;
+  padding: 9px 14px !important;
+
+  border-radius: 999px !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  white-space: nowrap !important;
+}
+
+.main-sticky-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 10px 22px rgba(50,166,74,0.25) !important;
+}
+
+/* I tab secondari devono stare sotto al menu principale sticky */
+.settimana > .week-day-tabs,
+.personale > .people-tabs,
+.classifica > .score-tabs,
+.storico > .history-tabs {
+  top: 68px !important;
+}
+
+/* Nome giorno nella card: pill bianco anche quando NON selezionato */
+.giorno .day-name {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 36px !important;
+  padding: 7px 13px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255,255,255,0.74) !important;
+  color: #142017 !important;
+
+  font-size: 1.02rem !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.035em !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 7px 14px rgba(24,48,30,0.05) !important;
+}
+
+/* Nome giorno selezionato: pill verde con X */
+.giorno .day-name.active-day-name {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 9px 18px rgba(50,166,74,0.23) !important;
+}
+
+.giorno .day-name.active-day-name::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 21px;
+  height: 21px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.82rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.giorno .day-title-row {
+  align-items: center !important;
+  gap: 9px !important;
+}
+
+@media (max-width: 520px) {
+  .main-sticky-tabs {
+    top: env(safe-area-inset-top, 0px) !important;
+    gap: 5px !important;
+    padding: 6px !important;
+    margin: 8px 0 12px !important;
+  }
+
+  .main-sticky-tabs > button {
+    min-height: 40px !important;
+    padding: 8px 9px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .settimana > .week-day-tabs,
+  .personale > .people-tabs,
+  .classifica > .score-tabs,
+  .storico > .history-tabs {
+    top: 58px !important;
+  }
+
+  .giorno .day-name {
+    min-height: 34px !important;
+    padding: 7px 11px !important;
+    font-size: 0.96rem !important;
+  }
+
+  .giorno .day-name.active-day-name::after {
+    width: 19px;
+    height: 19px;
+  }
+}
+
+
+/* === CASA ROSSI HISTORY WEEK PILL === */
+
+.history-week-button {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+
+  min-height: 62px !important;
+  padding: 10px 15px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 22px !important;
+  background: rgba(255,255,255,0.74) !important;
+  color: #142017 !important;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    0 7px 14px rgba(24,48,30,0.05) !important;
+
+  cursor: pointer !important;
+  text-align: left !important;
+}
+
+.history-week-button span {
+  display: block;
+  color: #6a766c;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+.history-week-button strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  color: #142017;
+  font-size: 1.18rem;
+  font-weight: 950;
+  line-height: 1.05;
+  letter-spacing: -0.04em;
+}
+
+.history-week-button.active {
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  box-shadow: 0 10px 20px rgba(50,166,74,0.24) !important;
+}
+
+.history-week-button.active span,
+.history-week-button.active strong {
+  color: #ffffff !important;
+}
+
+.history-week-button.active strong::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.84rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+/* Anche il tab settimana in alto mostra la X quando selezionato */
+.storico > .history-tabs > button.active:not(:first-child)::after {
+  content: "×";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 19px;
+  height: 19px;
+  border-radius: 999px;
+
+  background: rgba(255,255,255,0.22);
+  color: #ffffff;
+
+  font-size: 0.78rem;
+  font-weight: 950;
+  line-height: 1;
+}
+
+.storico > .history-tabs > button {
+  gap: 7px !important;
+}
+
+@media (max-width: 520px) {
+  .history-week-button {
+    min-height: 56px !important;
+    padding: 9px 13px !important;
+    border-radius: 20px !important;
+  }
+
+  .history-week-button strong {
+    font-size: 1.02rem;
+  }
+
+  .history-week-button.active strong::after {
+    width: 20px;
+    height: 20px;
+  }
+}
+

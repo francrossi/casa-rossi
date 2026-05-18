@@ -52,6 +52,7 @@ type StoricoSettimanale = {
   }
 }
 
+const AUTO_ASSIGN_BACKUP_KEY = 'casaRossiBackupPrimaDistribuzione'
 const persone = ['Francesco', 'Laura', 'Leonardo', 'Alessandro', 'Edoardo']
 
 const giorni = ['Sabato', 'Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì']
@@ -111,16 +112,40 @@ const reminderKey = 'casaRossiReminderPersonali'
 const storicoKey = 'casaRossiStoricoSettimane'
 const activeWeekKey = 'casaRossiSettimanaAttiva'
 
+type FasciaGiornata = 'tutti' | 'mattina' | 'pranzo' | 'pomeriggio' | 'sera'
+
+const fasceGiornata: { id: FasciaGiornata; label: string; emoji: string }[] = [
+  { id: 'tutti', label: 'Tutti', emoji: '✨' },
+  { id: 'mattina', label: 'Mattina', emoji: '🌅' },
+  { id: 'pranzo', label: 'Pranzo', emoji: '🍽️' },
+  { id: 'pomeriggio', label: 'Pomeriggio', emoji: '🌿' },
+  { id: 'sera', label: 'Sera', emoji: '🌙' },
+]
+
+
 
 function App() {
   const [schermata, setSchermata] = useState<'settimana' | 'classifica' | 'personale' | 'storico'>('settimana')
+  const [personaSelezionata, setPersonaSelezionata] = useState<string | null>(null)
+  const [personaClassificaSelezionata, setPersonaClassificaSelezionata] = useState<string | null>(null)
+  const [storicoSelezionatoId, setStoricoSelezionatoId] = useState<string | null>(null)
   const [statoSettimana, setStatoSettimana] = useState<StatoSettimana>({})
   const [reminderPersonali, setReminderPersonali] = useState<Reminder[]>([])
   const [storico, setStorico] = useState<StoricoSettimanale[]>([])
   const [activeWeek, setActiveWeek] = useState<ActiveWeek | null>(null)
   const [settimanaInizialeInput, setSettimanaInizialeInput] = useState('')
   const [filtro, setFiltro] = useState<'tutti' | 'daFare' | 'fatti' | 'nonAssegnati'>('tutti')
+  const [fasciaGiornata, setFasciaGiornata] = useState<FasciaGiornata>('tutti')
+
+  const [backupDistribuzioneDisponibile, setBackupDistribuzioneDisponibile] = useState<boolean>(() => {
+    try {
+      return Boolean(localStorage.getItem(AUTO_ASSIGN_BACKUP_KEY))
+    } catch {
+      return false
+    }
+  })
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
+  const [giornoSelezionato, setGiornoSelezionato] = useState<string | null>(null)
 
   const createInitialState = (): StatoSettimana => {
     const init: StatoSettimana = {}
@@ -485,8 +510,58 @@ function App() {
     }
     return true
   }
+  const getFasciaCompito = (nome: string): FasciaGiornata => {
+    const n = nome.toLowerCase()
+
+    if (n.includes('sera') || n.includes('cena')) return 'sera'
+    if (n.includes('pranzo')) return 'pranzo'
+    if (n.includes('piante') || n.includes('spesa')) return 'pomeriggio'
+
+    if (
+      n.includes('mattina') ||
+      n.includes('appa') ||
+      n.includes('lettiera') ||
+      n.includes('lavatrice') ||
+      n.includes('asciugatrice') ||
+      n.includes('panni') ||
+      n.includes('bagni')
+    ) {
+      return 'mattina'
+    }
+
+    return 'pomeriggio'
+  }
+
+  const filterFasciaCompito = (compito: Compito) => {
+    return fasciaGiornata === 'tutti' || getFasciaCompito(compito.nome) === fasciaGiornata
+  }
+
+  const apriGiorno = (giorno: string) => {
+    setGiornoSelezionato(giorno)
+    setFasciaGiornata('tutti')
+    setExpandedDays({ [giorno]: true })
+
+    window.requestAnimationFrame(() => {
+      document.getElementById('giorno-dettaglio')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+  }
+
+  const tornaAllaSettimana = () => {
+    setGiornoSelezionato(null)
+    setExpandedDays({})
+    setFasciaGiornata('tutti')
+  }
+
   const toggleDay = (giorno: string) => {
-    setExpandedDays(prev => ({ ...prev, [giorno]: !prev[giorno] }))
+    if (giornoSelezionato === giorno) {
+      tornaAllaSettimana()
+      return
+    }
+
+    apriGiorno(giorno)
   }
 
   const getStoricoBalance = () => {
@@ -663,6 +738,131 @@ function App() {
     return { daFare, fatti }
   }
 
+  const segnaFattoDaRiepilogoPersonale = (label: string) => {
+    const separator = ': '
+    const separatorIndex = label.indexOf(separator)
+
+    if (separatorIndex === -1) return
+
+    const giorno = label.slice(0, separatorIndex)
+    const nomeCompito = label.slice(separatorIndex + separator.length)
+
+    if (!giorno || !nomeCompito) return
+
+    segnaFatto(giorno, nomeCompito)
+  }
+
+  const distribuisciCompitiNonAssegnati = () => {
+    if (!window.confirm('Vuoi distribuire automaticamente tutti i compiti non assegnati tra i membri della famiglia?')) {
+      return
+    }
+
+    try {
+      localStorage.setItem(AUTO_ASSIGN_BACKUP_KEY, JSON.stringify(statoSettimana))
+      setBackupDistribuzioneDisponibile(true)
+    } catch {
+      setBackupDistribuzioneDisponibile(true)
+    }
+
+    setStatoSettimana(prev => {
+      const next: StatoSettimana = {}
+      const carico: Record<string, number> = {}
+
+      persone.forEach(persona => {
+        carico[persona] = 0
+      })
+
+      giorni.forEach(giorno => {
+        next[giorno] = { ...(prev[giorno] ?? {}) }
+
+        compiti.forEach(compito => {
+          if (!compito.giorni.includes(giorno)) return
+
+          const stato = prev[giorno]?.[compito.nome]
+
+          if (stato?.assegnato) {
+            carico[stato.assegnato] = (carico[stato.assegnato] ?? 0) + compito.punti
+          }
+        })
+      })
+
+      giorni.forEach(giorno => {
+        compiti.forEach(compito => {
+          if (!compito.giorni.includes(giorno)) return
+
+          const stato = next[giorno]?.[compito.nome] ?? { assegnato: null, fatto: false }
+
+          if (stato.assegnato || stato.fatto) return
+
+          const personaConMenoCarico = [...persone].sort((a, b) => {
+            const diff = (carico[a] ?? 0) - (carico[b] ?? 0)
+            return diff !== 0 ? diff : persone.indexOf(a) - persone.indexOf(b)
+          })[0]
+
+          next[giorno][compito.nome] = {
+            ...stato,
+            assegnato: personaConMenoCarico,
+          }
+
+          carico[personaConMenoCarico] = (carico[personaConMenoCarico] ?? 0) + compito.punti
+        })
+      })
+
+      return next
+    })
+  }
+
+  const ripristinaAssegnazioniPrecedenti = () => {
+    try {
+      const raw = localStorage.getItem(AUTO_ASSIGN_BACKUP_KEY)
+
+      if (!raw) {
+        window.alert('Non ho trovato uno stato precedente da ripristinare.')
+        return
+      }
+
+      if (!window.confirm('Vuoi ripristinare le assegnazioni precedenti alla distribuzione automatica?')) {
+        return
+      }
+
+      const backup = JSON.parse(raw) as StatoSettimana
+      setStatoSettimana(backup)
+      localStorage.removeItem(AUTO_ASSIGN_BACKUP_KEY)
+      setBackupDistribuzioneDisponibile(false)
+    } catch {
+      window.alert('Non sono riuscito a ripristinare le assegnazioni precedenti.')
+    }
+  }
+
+  const filterCounts = (() => {
+    let total = 0
+    let fatti = 0
+    let nonAssegnati = 0
+
+    giorni.forEach(giorno => {
+      compiti.forEach(compito => {
+        if (!compito.giorni.includes(giorno)) return
+
+        total += 1
+        const stato = statoSettimana[giorno]?.[compito.nome] || { assegnato: null, fatto: false }
+
+        if (stato.fatto) fatti += 1
+        if (!stato.assegnato) nonAssegnati += 1
+      })
+    })
+
+    return {
+      total,
+      fatti,
+      daFare: total - fatti,
+      nonAssegnati,
+    }
+  })()
+
+  const weeklyProgress = filterCounts.total > 0
+    ? Math.round((filterCounts.fatti / filterCounts.total) * 100)
+    : 0
+
   return (
     <div className="app">
       <header>
@@ -676,6 +876,14 @@ function App() {
           <button onClick={() => setSchermata('storico')} className={schermata === 'storico' ? 'active' : ''}>Storico</button>
         </nav>
       </header>
+
+      <nav className="main-sticky-tabs" aria-label="Navigazione principale">
+        <button onClick={() => setSchermata('settimana')} className={schermata === 'settimana' ? 'active' : ''}>Settimana</button>
+        <button onClick={() => setSchermata('classifica')} className={schermata === 'classifica' ? 'active' : ''}>Classifica</button>
+        <button onClick={() => setSchermata('personale')} className={schermata === 'personale' ? 'active' : ''}>Personale</button>
+        <button onClick={() => setSchermata('storico')} className={schermata === 'storico' ? 'active' : ''}>Storico</button>
+      </nav>
+
       <main>
         {schermata === 'settimana' && (
           <div className="settimana">
@@ -697,24 +905,166 @@ function App() {
                 <div>{getWeekSummary().nonAssegnati}</div>
               </div>
             </div>
-            <div className="filter-buttons">
-              <button className={filtro === 'tutti' ? 'active' : ''} onClick={() => setFiltro('tutti')}>Tutti</button>
-              <button className={filtro === 'daFare' ? 'active' : ''} onClick={() => setFiltro('daFare')}>Da fare</button>
-              <button className={filtro === 'fatti' ? 'active' : ''} onClick={() => setFiltro('fatti')}>Fatti</button>
-              <button className={filtro === 'nonAssegnati' ? 'active' : ''} onClick={() => setFiltro('nonAssegnati')}>Non assegnati</button>
+            <div className="mission-console">
+              <div className="mission-head">
+                <div>
+                  <span className="mission-eyebrow">Console settimana</span>
+                  <strong>Missione famiglia</strong>
+                </div>
+                <div className="mission-percent">{weeklyProgress}%</div>
+              </div>
+
+              <div className="mission-track" aria-label={`Progresso settimana ${weeklyProgress}%`}>
+                <span style={{ width: `${weeklyProgress}%` }} />
+              </div>
+
+              <div className="mission-grid">
+                <div className="mission-chip">
+                  <span className="mission-led led-green" />
+                  <b>{filterCounts.fatti}</b>
+                  <small>fatti</small>
+                </div>
+                <div className="mission-chip">
+                  <span className="mission-led led-amber" />
+                  <b>{filterCounts.daFare}</b>
+                  <small>da fare</small>
+                </div>
+                <div className="mission-chip">
+                  <span className="mission-led led-red" />
+                  <b>{filterCounts.nonAssegnati}</b>
+                  <small>non assegnati</small>
+                </div>
+              </div>
+
+              {backupDistribuzioneDisponibile && (
+                <button
+                  type="button"
+                  className="mission-restore-button"
+                  onClick={ripristinaAssegnazioniPrecedenti}
+                >
+                  ↩ Ripristina assegnazioni precedenti
+                </button>
+              )}
             </div>
-            {giorni.map(giorno => {
-              const { total, fatti } = getDayStats(giorno)
-              const expanded = expandedDays[giorno]
-              const tasks = compiti.filter(c => c.giorni.includes(giorno) && filterCompiti(c, giorno))
-              return (
-                <div key={giorno} className={`giorno ${expanded ? 'expanded' : 'collapsed'}`}>
-                  <button type="button" className="day-toggle" onClick={() => toggleDay(giorno)}>
-                    <span>{giorno}</span>
-                    <span>{fatti}/{total} fatti</span>
+
+            <div className="filter-buttons">
+              <button className={filtro === 'tutti' ? 'active' : ''} onClick={() => { setFiltro('tutti'); setExpandedDays({}) }}>
+                <span className="filter-label">Tutti</span>
+                <span className="filter-count">{filterCounts.total}</span>
+              </button>
+              <button className={filtro === 'daFare' ? 'active' : ''} onClick={() => { setFiltro('daFare'); setExpandedDays({}) }}>
+                <span className="filter-label">Da fare</span>
+                <span className="filter-count">{filterCounts.daFare}</span>
+              </button>
+              <button className={filtro === 'fatti' ? 'active' : ''} onClick={() => { setFiltro('fatti'); setExpandedDays({}) }}>
+                <span className="filter-label">Fatti</span>
+                <span className="filter-count">{filterCounts.fatti}</span>
+              </button>
+              <button className={filtro === 'nonAssegnati' ? 'active' : ''} onClick={() => { setFiltro('nonAssegnati'); setExpandedDays({}) }}>
+                <span className="filter-label">Non assegnati</span>
+                <span className="filter-count">{filterCounts.nonAssegnati}</span>
+              </button>
+            </div>
+
+            {filterCounts.nonAssegnati > 0 && (
+              <div className="unassigned-alert" role="status">
+                <div className="unassigned-alert-icon">⚠️</div>
+                <div>
+                  <strong>{filterCounts.nonAssegnati} compiti non assegnati</strong>
+                  <p>Assegnali ai membri della famiglia per attivare classifica e progressi personali.</p>
+                  <button
+                    type="button"
+                    className="unassigned-auto-button"
+                    onClick={distribuisciCompitiNonAssegnati}
+                  >
+                    Distribuisci automaticamente
                   </button>
+                </div>
+              </div>
+            )}
+
+            <div className="week-day-tabs" aria-label="Navigazione giorni settimana">
+              <button
+                type="button"
+                className={!giornoSelezionato ? 'active' : ''}
+                onClick={tornaAllaSettimana}
+              >
+                Settimana
+              </button>
+              {giorni.map(giorno => (
+                <button
+                  key={giorno}
+                  type="button"
+                  className={giornoSelezionato === giorno ? 'active' : ''}
+                  onClick={() => {
+                    if (giornoSelezionato === giorno) {
+                      tornaAllaSettimana()
+                    } else {
+                      apriGiorno(giorno)
+                    }
+                  }}
+                >
+                  {giorno.slice(0, 3)}
+                </button>
+              ))}
+            </div>
+
+            {giornoSelezionato && (
+              <div className="day-detail-toolbar">
+                <div>
+                  <span>Dettaglio giorno</span>
+                  <strong>{giornoSelezionato}</strong>
+                </div>
+                <button type="button" onClick={tornaAllaSettimana}>
+                  Torna alla settimana
+                </button>
+              </div>
+            )}
+
+            {giorni.map(giorno => {
+              if (giornoSelezionato && giorno !== giornoSelezionato) return null
+              const { total, fatti } = getDayStats(giorno)
+              const expanded = giornoSelezionato === giorno ? true : expandedDays[giorno]
+              const tasks = compiti.filter(c => c.giorni.includes(giorno) && filterCompiti(c, giorno) && filterFasciaCompito(c))
+              const dayPercent = total > 0 ? Math.round((fatti / total) * 100) : 0
+              const dayMood = total > 0 && fatti === total ? 'done' : fatti > 0 ? 'progress' : 'todo'
+              const dayStatus = dayMood === 'done' ? 'Completato' : dayMood === 'progress' ? 'In corso' : 'Da iniziare'
+              return (
+                <div key={giorno} id={giornoSelezionato === giorno ? 'giorno-dettaglio' : undefined} className={`giorno ${expanded ? 'expanded' : 'collapsed'} ${dayMood} ${giornoSelezionato === giorno ? 'selected-day' : ''}`}>
+                  <button type="button" className="day-toggle" onClick={() => toggleDay(giorno)}>
+                    <div className="day-main">
+                      <div className="day-title-row">
+                        <span className="day-name">{giorno}</span>
+                        <span className={`day-state ${dayMood}`}>{dayStatus}</span>
+                      </div>
+                      <span className="day-subtitle">{fatti}/{total} fatti</span>
+                    </div>
+
+                    <div className="day-score">
+                      <strong>{dayPercent}%</strong>
+                      <span className="day-open-indicator">{expanded ? '−' : '+'}</span>
+                    </div>
+                  </button>
+
+                  <div className="day-progress" aria-hidden="true">
+                    <span style={{ width: `${dayPercent}%` }} />
+                  </div>
                   {expanded && (
                     <div className="compiti">
+                  <div className="time-filter" role="tablist" aria-label="Filtro fascia giornata">
+                    {fasceGiornata.map(fascia => (
+                      <button
+                        key={fascia.id}
+                        type="button"
+                        className={fasciaGiornata === fascia.id ? 'active' : ''}
+                        onClick={() => setFasciaGiornata(fascia.id)}
+                      >
+                        <span>{fascia.emoji}</span>
+                        <span>{fascia.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
                       {tasks.length > 0 ? tasks.map(compito => {
                         const stato = statoSettimana[giorno]?.[compito.nome] || { assegnato: null, fatto: false }
                         return (
@@ -728,15 +1078,27 @@ function App() {
                               <span className="compito-stato">{stato.fatto ? 'Fatto' : 'Da fare'}</span>
                             </div>
                             <div className="compito-actions">
-                              <select
-                                value={stato.assegnato || ''}
-                                disabled={stato.fatto}
-                                className={stato.fatto ? 'select-disabled' : ''}
-                                onChange={(e) => assegnaCompito(giorno, compito.nome, e.target.value || null)}
-                              >
-                                <option value="">Nessuno</option>
-                                {persone.map(p => <option key={p} value={p}>{p}</option>)}
-                              </select>
+                              <div className="assign-panel" aria-label={`Assegna ${compito.nome}`}>
+                                <button
+                                  type="button"
+                                  className={!stato.assegnato ? 'active' : ''}
+                                  disabled={stato.fatto}
+                                  onClick={() => assegnaCompito(giorno, compito.nome, null)}
+                                >
+                                  Nessuno
+                                </button>
+                                {persone.map(persona => (
+                                  <button
+                                    key={persona}
+                                    type="button"
+                                    className={stato.assegnato === persona ? 'active' : ''}
+                                    disabled={stato.fatto}
+                                    onClick={() => assegnaCompito(giorno, compito.nome, persona)}
+                                  >
+                                    {persona}
+                                  </button>
+                                ))}
+                              </div>
                               <button onClick={() => segnaFatto(giorno, compito.nome)}>
                                 {stato.fatto ? 'Annulla' : 'Fatto'}
                               </button>
@@ -773,129 +1135,438 @@ function App() {
         )}
         {schermata === 'classifica' && (
           <div className="classifica">
-            <h2>Classifica settimana corrente</h2>
-            <ul>
-              {calcolaClassifica().map(([persona, punti]) => (
-                <li key={persona}>{persona}: {punti} punti</li>
-              ))}
-            </ul>
-            <div className="historic-balance">
-              <h2>Bilancio storico</h2>
-              {storico.length === 0 ? (
-                <p>Nessuno storico disponibile. Il bilancio si formerà dopo il primo reset settimana.</p>
-              ) : (
-                <div className="balances-grid">
-                  {(() => {
-                    const { totals, tasksFatti, remindersFatti, quota, balance } = getStoricoBalance()
-                    return (
-                      <>
-                        <div>
-                          <strong>Punti totali storici</strong>
-                          <ul>
-                            {Object.entries(totals).map(([persona, punti]) => (
-                              <li key={persona}>{persona}: {punti}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Compiti fatti storici</strong>
-                          <ul>
-                            {Object.entries(tasksFatti).map(([persona, count]) => (
-                              <li key={persona}>{persona}: {count}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Reminder fatti storici</strong>
-                          <ul>
-                            {Object.entries(remindersFatti).map(([persona, count]) => (
-                              <li key={persona}>{persona}: {count}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <strong>Quota equa</strong>
-                          <div>{Math.round(quota * 100) / 100} punti</div>
-                        </div>
-                        <div>
-                          <strong>Credito / Debito</strong>
-                          <ul>
-                            {Object.entries(balance).map(([persona, diff]) => (
-                              <li key={persona}>{persona}: {diff >= 0 ? `Credito +${diff}` : `Debito ${diff}`}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </>
-                    )
-                  })()}
-                </div>
-              )}
+            <div className="screen-title-card">
+              <span className="screen-eyebrow">Scoreboard</span>
+              <h2>Classifica famiglia</h2>
+              <p>Punti della settimana corrente e bilancio storico tra i membri della casa.</p>
             </div>
+
+            <div className="score-tabs" aria-label="Filtro classifica per membro">
+              <button
+                type="button"
+                className={!personaClassificaSelezionata ? 'active' : ''}
+                onClick={() => setPersonaClassificaSelezionata(null)}
+              >
+                Tutti
+              </button>
+              {persone.map(persona => (
+                <button
+                  key={persona}
+                  type="button"
+                  className={personaClassificaSelezionata === persona ? 'active' : ''}
+                  onClick={() => {
+                    setPersonaClassificaSelezionata(personaClassificaSelezionata === persona ? null : persona)
+                  }}
+                >
+                  {persona}
+                </button>
+              ))}
+            </div>
+
+            {(() => {
+              const ranking = calcolaClassifica()
+              const rankingDaMostrare = personaClassificaSelezionata
+                ? ranking.filter(([persona]) => persona === personaClassificaSelezionata)
+                : ranking
+              const maxPoints = ranking[0]?.[1] ?? 0
+              const { totals, tasksFatti, remindersFatti, quota, balance } = getStoricoBalance()
+              const personaFocus = personaClassificaSelezionata
+              const trendFocus = personaFocus
+                ? [...storico].reverse().map(entry => ({
+                  id: entry.id,
+                  weekLabel: entry.weekLabel,
+                  punti: entry.punteggi[personaFocus] ?? 0,
+                  compiti: entry.compitiFatti[personaFocus] ?? 0,
+                  reminder: entry.reminderFatti[personaFocus] ?? 0,
+                }))
+                : []
+              const maxTrendFocus = Math.max(1, ...trendFocus.map(item => item.punti))
+              const totalePuntiFocus = personaFocus ? totals[personaFocus] ?? 0 : 0
+              const compitiFocus = personaFocus ? tasksFatti[personaFocus] ?? 0 : 0
+              const reminderFocus = personaFocus ? remindersFatti[personaFocus] ?? 0 : 0
+              const balanceFocus = personaFocus ? balance[personaFocus] ?? 0 : 0
+              const messaggioFocus = !personaFocus
+                ? ''
+                : balanceFocus > 0
+                  ? `Ottimo lavoro, ${personaFocus}: sei sopra la quota equa.`
+                  : balanceFocus === 0
+                    ? `Perfetto equilibrio, ${personaFocus}: sei esattamente in linea con la quota.`
+                    : `Forza ${personaFocus}: puoi recuperare qualche punto nelle prossime settimane.`
+
+              return (
+                <>
+                  <div className="leaderboard-console">
+                    <div className="leaderboard-head">
+                      <div>
+                        <span className="mission-eyebrow">Settimana corrente</span>
+                        <strong>Podio attività</strong>
+                      </div>
+                      <div className="leaderboard-total">{maxPoints} pt</div>
+                    </div>
+
+                    <div className="leaderboard-list">
+                      {rankingDaMostrare.map(([persona, punti]) => {
+                        const index = ranking.findIndex(([nome]) => nome === persona)
+                        const percent = maxPoints > 0 ? Math.round((punti / maxPoints) * 100) : 0
+                        const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '•'
+
+                        return (
+                          <div key={persona} className={`rank-card rank-${index + 1}`}>
+                            <div className="rank-medal">{medal}</div>
+                            <div className="rank-info">
+                              <div className="rank-top">
+                                <button
+                                  type="button"
+                                  className={`score-name-button ${personaClassificaSelezionata === persona ? 'active' : ''}`}
+                                  onClick={() => setPersonaClassificaSelezionata(personaClassificaSelezionata === persona ? null : persona)}
+                                >
+                                  {persona}
+                                </button>
+                                <span>{punti} punti</span>
+                              </div>
+                              <div className="rank-track" aria-hidden="true">
+                                <span style={{ width: `${percent}%` }} />
+                              </div>
+                            </div>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+
+                  {personaFocus && (
+                    <div className="score-focus-panel">
+                      <div className="score-focus-head">
+                        <div>
+                          <span className="screen-eyebrow">Focus membro</span>
+                          <h2>{personaFocus}</h2>
+                        </div>
+                        <div className={`focus-balance-pill ${balanceFocus >= 0 ? 'credit' : 'debit'}`}>
+                          {balanceFocus >= 0 ? `+${balanceFocus}` : balanceFocus}
+                        </div>
+                      </div>
+
+                      <div className="focus-kpis">
+                        <div>
+                          <strong>{totalePuntiFocus}</strong>
+                          <span>punti storici</span>
+                        </div>
+                        <div>
+                          <strong>{compitiFocus}</strong>
+                          <span>compiti fatti</span>
+                        </div>
+                        <div>
+                          <strong>{reminderFocus}</strong>
+                          <span>reminder fatti</span>
+                        </div>
+                      </div>
+
+                      <div className="focus-message">
+                        {messaggioFocus}
+                      </div>
+
+                      <div className="focus-trend">
+                        <strong>Andamento settimane</strong>
+                        {trendFocus.length > 0 ? (
+                          <div className="focus-trend-list">
+                            {trendFocus.map(item => {
+                              const percent = Math.round((item.punti / maxTrendFocus) * 100)
+
+                              return (
+                                <div key={item.id} className="focus-trend-row">
+                                  <span>{item.weekLabel}</span>
+                                  <div className="focus-trend-track" aria-hidden="true">
+                                    <i style={{ width: `${percent}%` }} />
+                                  </div>
+                                  <b>{item.punti} pt</b>
+                                  <small>{item.compiti} compiti · {item.reminder} reminder</small>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        ) : (
+                          <div className="empty-state-card">
+                            <strong>Nessuno storico personale</strong>
+                            <p>Il grafico apparirà dopo la chiusura della prima settimana.</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="historic-balance dashboard-panel">
+                    <div className="panel-title-row">
+                      <div>
+                        <span className="screen-eyebrow">Bilancio storico</span>
+                        <h2>Credito / Debito</h2>
+                      </div>
+                      <span className="quota-pill">Quota equa {Math.round(quota * 100) / 100} pt</span>
+                    </div>
+
+                    {storico.length === 0 ? (
+                      <div className="empty-state-card">
+                        <strong>Nessuno storico disponibile</strong>
+                        <p>Il bilancio si formerà dopo il primo reset settimana.</p>
+                      </div>
+                    ) : (
+                      <div className="balance-cards">
+                        {(personaSelezionata ? [personaSelezionata] : persone).map(persona => {
+                          const diff = balance[persona] ?? 0
+                          const isCredit = diff >= 0
+
+                          return (
+                            <div key={persona} className={`balance-card ${isCredit ? 'credit' : 'debit'}`}>
+                              <div className="balance-top">
+                                <button
+                                  type="button"
+                                  className={`score-name-button balance ${personaClassificaSelezionata === persona ? 'active' : ''}`}
+                                  onClick={() => setPersonaClassificaSelezionata(personaClassificaSelezionata === persona ? null : persona)}
+                                >
+                                  {persona}
+                                </button>
+                                <span>{isCredit ? `+${diff}` : diff}</span>
+                              </div>
+                              <small>{isCredit ? 'Credito' : 'Debito'}</small>
+                              <div className="balance-meta">
+                                <span>{totals[persona] ?? 0} pt storici</span>
+                                <span>{tasksFatti[persona] ?? 0} compiti</span>
+                                <span>{remindersFatti[persona] ?? 0} reminder</span>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </>
+              )
+            })()}
           </div>
         )}
         {schermata === 'personale' && (
           <div className="personale">
-            <h2>Riepilogo Personale</h2>
-            {persone.map(persona => {
-              const compiti = compitiPersonali(persona)
-              const reminder = reminderPersonale(persona)
-              return (
-                <div key={persona} className="persona-riepilogo">
-                  <h3>{persona}</h3>
-                  <div className="persona-section">
-                    <div>
-                      <strong>Compiti da fare</strong>
-                      <ul>
-                        {compiti.daFare.length > 0 ? compiti.daFare.map(item => <li key={item}>{item}</li>) : <li>Nessun compito da fare</li>}
-                      </ul>
+            <div className="screen-title-card">
+              <span className="screen-eyebrow">Dashboard personale</span>
+              <h2>Riepilogo membri</h2>
+              <p>Controlla compiti, reminder e avanzamento individuale di ogni membro della famiglia.</p>
+            </div>
+
+            <div className="people-tabs" aria-label="Navigazione membri famiglia">
+              <button
+                type="button"
+                className={!personaSelezionata ? 'active' : ''}
+                onClick={() => setPersonaSelezionata(null)}
+              >
+                Tutti
+              </button>
+              {persone.map(persona => (
+                <button
+                  key={persona}
+                  type="button"
+                  className={personaSelezionata === persona ? 'active' : ''}
+                  onClick={() => {
+                    setPersonaSelezionata(personaSelezionata === persona ? null : persona)
+                  }}
+                >
+                  {persona}
+                </button>
+              ))}
+            </div>
+
+            <div className="people-dashboard">
+              {(personaSelezionata ? [personaSelezionata] : persone).map(persona => {
+                const personalTasks = compitiPersonali(persona)
+                const reminders = reminderPersonale(persona)
+
+                const openItems = personalTasks.daFare.length + reminders.daFare.length
+                const doneItems = personalTasks.fatti.length + reminders.fatti.length
+                const totalItems = openItems + doneItems
+                const progress = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0
+
+                return (
+                  <div
+                  key={persona}
+                  className={`person-card ${personaSelezionata === persona ? 'selected-person' : 'person-summary-only'}`}
+                  role={!personaSelezionata ? 'button' : undefined}
+                  tabIndex={!personaSelezionata ? 0 : undefined}
+                  onClick={() => {
+                    if (!personaSelezionata) setPersonaSelezionata(persona)
+                  }}
+                  onKeyDown={(event) => {
+                    if (!personaSelezionata && (event.key === 'Enter' || event.key === ' ')) {
+                      event.preventDefault()
+                      setPersonaSelezionata(persona)
+                    }
+                  }}
+                >
+                    <div className="person-head">
+                      <div>
+                        <span className="screen-eyebrow">Membro famiglia</span>
+                        <button
+                          type="button"
+                          className={`person-name-button ${personaSelezionata === persona ? 'active' : ''}`}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setPersonaSelezionata(personaSelezionata === persona ? null : persona)
+                          }}
+                        >
+                          {persona}
+                        </button>
+                      </div>
+                      <div className="person-percent">{progress}%</div>
                     </div>
-                    <div>
-                      <strong>Compiti fatti</strong>
-                      <ul>
-                        {compiti.fatti.length > 0 ? compiti.fatti.map(item => <li key={item}>{item}</li>) : <li>Nessun compito fatto</li>}
-                      </ul>
+
+                    <div className="person-track" aria-hidden="true">
+                      <span style={{ width: `${progress}%` }} />
+                    </div>
+
+                    <div className="person-kpis">
+                      <div>
+                        <strong>{personalTasks.daFare.length}</strong>
+                        <span>compiti da fare</span>
+                      </div>
+                      <div>
+                        <strong>{personalTasks.fatti.length}</strong>
+                        <span>compiti fatti</span>
+                      </div>
+                      <div>
+                        <strong>{reminders.daFare.length}</strong>
+                        <span>reminder aperti</span>
+                      </div>
+                      <div>
+                        <strong>{reminders.fatti.length}</strong>
+                        <span>reminder fatti</span>
+                      </div>
+                    </div>
+
+                    <div className="personal-sections">
+                      <div className="personal-panel todo">
+                        <strong>Compiti da fare</strong>
+                        <ul>
+                          {personalTasks.daFare.length > 0
+                            ? personalTasks.daFare.map(item => (
+                              <li key={item} className="personal-task-item">
+                                <span>{item}</span>
+                                <button type="button" onClick={() => segnaFattoDaRiepilogoPersonale(item)}>
+                                  Fatto
+                                </button>
+                              </li>
+                            ))
+                            : <li>Nessun compito da fare</li>}
+                        </ul>
+                      </div>
+
+                      <div className="personal-panel done">
+                        <strong>Compiti fatti</strong>
+                        <ul>
+                          {personalTasks.fatti.length > 0
+                            ? personalTasks.fatti.map(item => (
+                              <li key={item} className="personal-task-item done">
+                                <span>{item}</span>
+                                <button type="button" onClick={() => segnaFattoDaRiepilogoPersonale(item)}>
+                                  Annulla
+                                </button>
+                              </li>
+                            ))
+                            : <li>Nessun compito fatto</li>}
+                        </ul>
+                      </div>
+
+                      <div className="personal-panel reminder">
+                        <strong>Reminder da fare</strong>
+                        <ul>
+                          {reminders.daFare.length > 0 ? reminders.daFare.map(item => (
+                            <li key={item.id} className="reminder-item">
+                              <span>{item.nome}</span>
+                              <button onClick={() => toggleReminder(item.id)}>Fatto</button>
+                            </li>
+                          )) : <li>Nessun reminder da fare</li>}
+                        </ul>
+                      </div>
+
+                      <div className="personal-panel done">
+                        <strong>Reminder fatti</strong>
+                        <ul>
+                          {reminders.fatti.length > 0 ? reminders.fatti.map(item => (
+                            <li key={item.id} className="reminder-item">
+                              <span>{item.nome}</span>
+                              <button onClick={() => toggleReminder(item.id)}>Annulla</button>
+                            </li>
+                          )) : <li>Nessun reminder fatto</li>}
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                  <div className="persona-section">
-                    <div>
-                      <strong>Reminder da fare</strong>
-                      <ul>
-                        {reminder.daFare.length > 0 ? reminder.daFare.map(item => (
-                          <li key={item.id} className="reminder-item">
-                            <span>{item.nome}</span>
-                            <button onClick={() => toggleReminder(item.id)}>Fatto</button>
-                          </li>
-                        )) : <li>Nessun reminder da fare</li>}
-                      </ul>
-                    </div>
-                    <div>
-                      <strong>Reminder fatti</strong>
-                      <ul>
-                        {reminder.fatti.length > 0 ? reminder.fatti.map(item => (
-                          <li key={item.id} className="reminder-item">
-                            <span>{item.nome}</span>
-                            <button onClick={() => toggleReminder(item.id)}>Annulla</button>
-                          </li>
-                        )) : <li>Nessun reminder fatto</li>}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
+                )
+              })}
+            </div>
           </div>
         )}
         {schermata === 'storico' && (
           <div className="storico">
-            <h2>Storico Settimane</h2>
+            <div className="screen-title-card storico-title-card">
+              <span className="screen-eyebrow">Archivio settimane</span>
+              <h2>Storico settimane</h2>
+              <p>Timeline delle settimane chiuse, con classifica finale, compiti e reminder completati.</p>
+            </div>
+            <h2 className="legacy-storico-title">Storico Settimane</h2>
+
+            {storico.length > 0 && (
+              <div className="history-tabs" aria-label="Navigazione storico settimane">
+                <button
+                  type="button"
+                  className={!storicoSelezionatoId ? 'active' : ''}
+                  onClick={() => setStoricoSelezionatoId(null)}
+                >
+                  Tutte
+                </button>
+                {storico.map(entry => (
+                  <button
+                    key={entry.id}
+                    type="button"
+                    className={storicoSelezionatoId === entry.id ? 'active' : ''}
+                    onClick={() => {
+                      setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                    }}
+                  >
+                    {entry.weekLabel}
+                  </button>
+                ))}
+              </div>
+            )}
+
             {storico.length === 0 ? (
               <p>Nessuna settimana salvata.</p>
             ) : (
               <div className="storico-list">
-                {storico.map(entry => (
-                  <div key={entry.id} className="storico-entry">
+                {(storicoSelezionatoId ? storico.filter(entry => entry.id === storicoSelezionatoId) : storico).map(entry => (
+                  <div
+                    key={entry.id}
+                    className={`storico-entry ${storicoSelezionatoId === entry.id ? 'selected-history' : 'history-summary-only'}`}
+                    role="button"
+                    tabIndex={0}
+                    onClick={() => {
+                      setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                    }}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                      }
+                    }}
+                  >
                     <div className="storico-header">
-                      <h3>Settimana {entry.weekLabel}</h3>
+                      <button
+                        type="button"
+                        className={`history-week-button ${storicoSelezionatoId === entry.id ? 'active' : ''}`}
+                        onClick={(event) => {
+                          event.stopPropagation()
+                          setStoricoSelezionatoId(storicoSelezionatoId === entry.id ? null : entry.id)
+                        }}
+                      >
+                        <span>Settimana</span>
+                        <strong>{entry.weekLabel}</strong>
+                      </button>
                       <div className="storico-meta">Salvata il {new Date(entry.savedAt).toLocaleString()}</div>
                     </div>
                     <div className="storico-grid">
