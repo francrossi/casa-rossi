@@ -2352,3 +2352,231 @@ input[type="date"] {
     border-radius: 16px !important;
   }
 }
+
+/* === CASA ROSSI AUTO ASSIGN BUTTON === */
+
+.unassigned-auto-button {
+  margin-top: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(50,166,74,0.22) !important;
+}
+
+@media (max-width: 520px) {
+  .unassigned-alert {
+    grid-template-columns: 1fr !important;
+  }
+
+  .unassigned-alert-icon {
+    margin-bottom: -4px;
+  }
+
+  .unassigned-auto-button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI PERSONAL TASK ACTIONS === */
+
+.personal-task-item {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.personal-task-item span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.personal-task-item button {
+  min-height: 38px !important;
+  padding: 7px 12px !important;
+  border-radius: 14px !important;
+  font-size: 0.86rem !important;
+  font-weight: 950 !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+  box-shadow: 0 8px 16px rgba(50,166,74,0.20) !important;
+}
+
+.personal-task-item.done button {
+  background: linear-gradient(135deg, #ffffff, #f4faf5) !important;
+  color: #172219 !important;
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 7px 14px rgba(24,48,30,0.06) !important;
+}
+
+@media (max-width: 520px) {
+  .personal-task-item {
+    grid-template-columns: 1fr !important;
+  }
+
+  .personal-task-item button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI RESTORE AUTO ASSIGN === */
+
+.restore-auto-alert {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 15px 16px;
+  border: 1px solid rgba(50, 166, 74, 0.32);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83, 194, 100, 0.16), transparent 34%),
+    linear-gradient(180deg, #f7fff8, #eef9f0);
+  box-shadow: var(--shadow);
+}
+
+.restore-auto-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: rgba(50, 166, 74, 0.16);
+  color: var(--green-dark);
+  font-size: 1.3rem;
+  font-weight: 950;
+}
+
+.restore-auto-alert strong {
+  display: block;
+  color: #1d2b20;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.restore-auto-alert p {
+  margin: 5px 0 0;
+  color: #667369;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.restore-auto-button {
+  margin-top: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
+}
+
+@media (max-width: 520px) {
+  .restore-auto-alert {
+    grid-template-columns: 1fr !important;
+  }
+
+  .restore-auto-button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI RESTORE AUTO ASSIGN WORKING === */
+
+.restore-auto-alert {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 15px 16px;
+  border: 1px solid rgba(50, 166, 74, 0.32);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83, 194, 100, 0.16), transparent 34%),
+    linear-gradient(180deg, #f7fff8, #eef9f0);
+  box-shadow: var(--shadow);
+}
+
+.restore-auto-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 14px;
+  background: rgba(50, 166, 74, 0.16);
+  color: var(--green-dark);
+  font-size: 1.3rem;
+  font-weight: 950;
+}
+
+.restore-auto-alert strong {
+  display: block;
+  color: #1d2b20;
+  font-size: 1.02rem;
+  font-weight: 950;
+  line-height: 1.15;
+}
+
+.restore-auto-alert p {
+  margin: 5px 0 0;
+  color: #667369;
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.restore-auto-button {
+  margin-top: 12px !important;
+  min-height: 44px !important;
+  padding: 10px 14px !important;
+  border: 0 !important;
+  border-radius: 16px !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
+}
+
+@media (max-width: 520px) {
+  .restore-auto-alert {
+    grid-template-columns: 1fr !important;
+  }
+
+  .restore-auto-button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI SIMPLE RESTORE BUTTON === */
+
+.mission-restore-button {
+  position: relative;
+  z-index: 1;
+  width: 100% !important;
+  min-height: 46px !important;
+  margin-top: 14px !important;
+  border: 0 !important;
+  border-radius: 17px !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  font-size: 0.92rem !important;
+  font-weight: 950 !important;
+  box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
+}
+

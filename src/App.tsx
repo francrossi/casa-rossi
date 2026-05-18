@@ -52,6 +52,7 @@ type StoricoSettimanale = {
   }
 }
 
+const AUTO_ASSIGN_BACKUP_KEY = 'casaRossiBackupPrimaDistribuzione'
 const persone = ['Francesco', 'Laura', 'Leonardo', 'Alessandro', 'Edoardo']
 
 const giorni = ['Sabato', 'Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì']
@@ -132,6 +133,14 @@ function App() {
   const [settimanaInizialeInput, setSettimanaInizialeInput] = useState('')
   const [filtro, setFiltro] = useState<'tutti' | 'daFare' | 'fatti' | 'nonAssegnati'>('tutti')
   const [fasciaGiornata, setFasciaGiornata] = useState<FasciaGiornata>('tutti')
+
+  const [backupDistribuzioneDisponibile, setBackupDistribuzioneDisponibile] = useState<boolean>(() => {
+    try {
+      return Boolean(localStorage.getItem(AUTO_ASSIGN_BACKUP_KEY))
+    } catch {
+      return false
+    }
+  })
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
 
   const createInitialState = (): StatoSettimana => {
@@ -703,6 +712,102 @@ function App() {
     return { daFare, fatti }
   }
 
+  const segnaFattoDaRiepilogoPersonale = (label: string) => {
+    const separator = ': '
+    const separatorIndex = label.indexOf(separator)
+
+    if (separatorIndex === -1) return
+
+    const giorno = label.slice(0, separatorIndex)
+    const nomeCompito = label.slice(separatorIndex + separator.length)
+
+    if (!giorno || !nomeCompito) return
+
+    segnaFatto(giorno, nomeCompito)
+  }
+
+  const distribuisciCompitiNonAssegnati = () => {
+    if (!window.confirm('Vuoi distribuire automaticamente tutti i compiti non assegnati tra i membri della famiglia?')) {
+      return
+    }
+
+    try {
+      localStorage.setItem(AUTO_ASSIGN_BACKUP_KEY, JSON.stringify(statoSettimana))
+      setBackupDistribuzioneDisponibile(true)
+    } catch {
+      setBackupDistribuzioneDisponibile(true)
+    }
+
+    setStatoSettimana(prev => {
+      const next: StatoSettimana = {}
+      const carico: Record<string, number> = {}
+
+      persone.forEach(persona => {
+        carico[persona] = 0
+      })
+
+      giorni.forEach(giorno => {
+        next[giorno] = { ...(prev[giorno] ?? {}) }
+
+        compiti.forEach(compito => {
+          if (!compito.giorni.includes(giorno)) return
+
+          const stato = prev[giorno]?.[compito.nome]
+
+          if (stato?.assegnato) {
+            carico[stato.assegnato] = (carico[stato.assegnato] ?? 0) + compito.punti
+          }
+        })
+      })
+
+      giorni.forEach(giorno => {
+        compiti.forEach(compito => {
+          if (!compito.giorni.includes(giorno)) return
+
+          const stato = next[giorno]?.[compito.nome] ?? { assegnato: null, fatto: false }
+
+          if (stato.assegnato || stato.fatto) return
+
+          const personaConMenoCarico = [...persone].sort((a, b) => {
+            const diff = (carico[a] ?? 0) - (carico[b] ?? 0)
+            return diff !== 0 ? diff : persone.indexOf(a) - persone.indexOf(b)
+          })[0]
+
+          next[giorno][compito.nome] = {
+            ...stato,
+            assegnato: personaConMenoCarico,
+          }
+
+          carico[personaConMenoCarico] = (carico[personaConMenoCarico] ?? 0) + compito.punti
+        })
+      })
+
+      return next
+    })
+  }
+
+  const ripristinaAssegnazioniPrecedenti = () => {
+    try {
+      const raw = localStorage.getItem(AUTO_ASSIGN_BACKUP_KEY)
+
+      if (!raw) {
+        window.alert('Non ho trovato uno stato precedente da ripristinare.')
+        return
+      }
+
+      if (!window.confirm('Vuoi ripristinare le assegnazioni precedenti alla distribuzione automatica?')) {
+        return
+      }
+
+      const backup = JSON.parse(raw) as StatoSettimana
+      setStatoSettimana(backup)
+      localStorage.removeItem(AUTO_ASSIGN_BACKUP_KEY)
+      setBackupDistribuzioneDisponibile(false)
+    } catch {
+      window.alert('Non sono riuscito a ripristinare le assegnazioni precedenti.')
+    }
+  }
+
   const filterCounts = (() => {
     let total = 0
     let fatti = 0
@@ -796,6 +901,16 @@ function App() {
                   <small>non assegnati</small>
                 </div>
               </div>
+
+              {backupDistribuzioneDisponibile && (
+                <button
+                  type="button"
+                  className="mission-restore-button"
+                  onClick={ripristinaAssegnazioniPrecedenti}
+                >
+                  ↩ Ripristina assegnazioni precedenti
+                </button>
+              )}
             </div>
 
             <div className="filter-buttons">
@@ -823,6 +938,13 @@ function App() {
                 <div>
                   <strong>{filterCounts.nonAssegnati} compiti non assegnati</strong>
                   <p>Assegnali ai membri della famiglia per attivare classifica e progressi personali.</p>
+                  <button
+                    type="button"
+                    className="unassigned-auto-button"
+                    onClick={distribuisciCompitiNonAssegnati}
+                  >
+                    Distribuisci automaticamente
+                  </button>
                 </div>
               </div>
             )}
@@ -1084,7 +1206,14 @@ function App() {
                         <strong>Compiti da fare</strong>
                         <ul>
                           {personalTasks.daFare.length > 0
-                            ? personalTasks.daFare.map(item => <li key={item}>{item}</li>)
+                            ? personalTasks.daFare.map(item => (
+                              <li key={item} className="personal-task-item">
+                                <span>{item}</span>
+                                <button type="button" onClick={() => segnaFattoDaRiepilogoPersonale(item)}>
+                                  Fatto
+                                </button>
+                              </li>
+                            ))
                             : <li>Nessun compito da fare</li>}
                         </ul>
                       </div>
@@ -1093,7 +1222,14 @@ function App() {
                         <strong>Compiti fatti</strong>
                         <ul>
                           {personalTasks.fatti.length > 0
-                            ? personalTasks.fatti.map(item => <li key={item}>{item}</li>)
+                            ? personalTasks.fatti.map(item => (
+                              <li key={item} className="personal-task-item done">
+                                <span>{item}</span>
+                                <button type="button" onClick={() => segnaFattoDaRiepilogoPersonale(item)}>
+                                  Annulla
+                                </button>
+                              </li>
+                            ))
                             : <li>Nessun compito fatto</li>}
                         </ul>
                       </div>
