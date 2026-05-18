@@ -111,6 +111,25 @@ const reminderKey = 'casaRossiReminderPersonali'
 const storicoKey = 'casaRossiStoricoSettimane'
 const activeWeekKey = 'casaRossiSettimanaAttiva'
 
+type FasciaGiornata = 'tutti' | 'mattina' | 'pranzo' | 'pomeriggio' | 'sera'
+
+const fasceGiornata: { id: FasciaGiornata; label: string; emoji: string }[] = [
+  { id: 'tutti', label: 'Tutti', emoji: '✨' },
+  { id: 'mattina', label: 'Mattina', emoji: '🌅' },
+  { id: 'pranzo', label: 'Pranzo', emoji: '🍽️' },
+  { id: 'pomeriggio', label: 'Pomeriggio', emoji: '🌿' },
+  { id: 'sera', label: 'Sera', emoji: '🌙' },
+]
+
+const getDefaultFasciaGiornata = (): FasciaGiornata => {
+  const hour = new Date().getHours()
+
+  if (hour < 11) return 'mattina'
+  if (hour < 15) return 'pranzo'
+  if (hour < 19) return 'pomeriggio'
+  return 'sera'
+}
+
 
 function App() {
   const [schermata, setSchermata] = useState<'settimana' | 'classifica' | 'personale' | 'storico'>('settimana')
@@ -120,6 +139,7 @@ function App() {
   const [activeWeek, setActiveWeek] = useState<ActiveWeek | null>(null)
   const [settimanaInizialeInput, setSettimanaInizialeInput] = useState('')
   const [filtro, setFiltro] = useState<'tutti' | 'daFare' | 'fatti' | 'nonAssegnati'>('tutti')
+  const [fasciaGiornata, setFasciaGiornata] = useState<FasciaGiornata>(() => getDefaultFasciaGiornata())
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
 
   const createInitialState = (): StatoSettimana => {
@@ -485,8 +505,36 @@ function App() {
     }
     return true
   }
+  const getFasciaCompito = (nome: string): FasciaGiornata => {
+    const n = nome.toLowerCase()
+
+    if (n.includes('sera') || n.includes('cena')) return 'sera'
+    if (n.includes('pranzo')) return 'pranzo'
+    if (n.includes('piante') || n.includes('spesa')) return 'pomeriggio'
+
+    if (
+      n.includes('mattina') ||
+      n.includes('appa') ||
+      n.includes('lettiera') ||
+      n.includes('lavatrice') ||
+      n.includes('asciugatrice') ||
+      n.includes('panni') ||
+      n.includes('bagni')
+    ) {
+      return 'mattina'
+    }
+
+    return 'pomeriggio'
+  }
+
+  const filterFasciaCompito = (compito: Compito) => {
+    return fasciaGiornata === 'tutti' || getFasciaCompito(compito.nome) === fasciaGiornata
+  }
+
   const toggleDay = (giorno: string) => {
-    setExpandedDays(prev => ({ ...prev, [giorno]: !prev[giorno] }))
+    const wasOpen = Boolean(expandedDays[giorno])
+    setFasciaGiornata(getDefaultFasciaGiornata())
+    setExpandedDays(wasOpen ? {} : { [giorno]: true })
   }
 
   const getStoricoBalance = () => {
@@ -663,6 +711,31 @@ function App() {
     return { daFare, fatti }
   }
 
+  const filterCounts = (() => {
+    let total = 0
+    let fatti = 0
+    let nonAssegnati = 0
+
+    giorni.forEach(giorno => {
+      compiti.forEach(compito => {
+        if (!compito.giorni.includes(giorno)) return
+
+        total += 1
+        const stato = statoSettimana[giorno]?.[compito.nome] || { assegnato: null, fatto: false }
+
+        if (stato.fatto) fatti += 1
+        if (!stato.assegnato) nonAssegnati += 1
+      })
+    })
+
+    return {
+      total,
+      fatti,
+      daFare: total - fatti,
+      nonAssegnati,
+    }
+  })()
+
   return (
     <div className="app">
       <header>
@@ -698,23 +771,63 @@ function App() {
               </div>
             </div>
             <div className="filter-buttons">
-              <button className={filtro === 'tutti' ? 'active' : ''} onClick={() => setFiltro('tutti')}>Tutti</button>
-              <button className={filtro === 'daFare' ? 'active' : ''} onClick={() => setFiltro('daFare')}>Da fare</button>
-              <button className={filtro === 'fatti' ? 'active' : ''} onClick={() => setFiltro('fatti')}>Fatti</button>
-              <button className={filtro === 'nonAssegnati' ? 'active' : ''} onClick={() => setFiltro('nonAssegnati')}>Non assegnati</button>
+              <button className={filtro === 'tutti' ? 'active' : ''} onClick={() => { setFiltro('tutti'); setExpandedDays({}) }}>
+                <span className="filter-label">Tutti</span>
+                <span className="filter-count">{filterCounts.total}</span>
+              </button>
+              <button className={filtro === 'daFare' ? 'active' : ''} onClick={() => { setFiltro('daFare'); setExpandedDays({}) }}>
+                <span className="filter-label">Da fare</span>
+                <span className="filter-count">{filterCounts.daFare}</span>
+              </button>
+              <button className={filtro === 'fatti' ? 'active' : ''} onClick={() => { setFiltro('fatti'); setExpandedDays({}) }}>
+                <span className="filter-label">Fatti</span>
+                <span className="filter-count">{filterCounts.fatti}</span>
+              </button>
+              <button className={filtro === 'nonAssegnati' ? 'active' : ''} onClick={() => { setFiltro('nonAssegnati'); setExpandedDays({}) }}>
+                <span className="filter-label">Non assegnati</span>
+                <span className="filter-count">{filterCounts.nonAssegnati}</span>
+              </button>
             </div>
+
+            {filterCounts.nonAssegnati > 0 && (
+              <div className="unassigned-alert" role="status">
+                <div className="unassigned-alert-icon">⚠️</div>
+                <div>
+                  <strong>{filterCounts.nonAssegnati} compiti non assegnati</strong>
+                  <p>Assegnali ai membri della famiglia per attivare classifica e progressi personali.</p>
+                </div>
+              </div>
+            )}
+
             {giorni.map(giorno => {
               const { total, fatti } = getDayStats(giorno)
               const expanded = expandedDays[giorno]
-              const tasks = compiti.filter(c => c.giorni.includes(giorno) && filterCompiti(c, giorno))
+              const tasks = compiti.filter(c => c.giorni.includes(giorno) && filterCompiti(c, giorno) && filterFasciaCompito(c))
               return (
                 <div key={giorno} className={`giorno ${expanded ? 'expanded' : 'collapsed'}`}>
                   <button type="button" className="day-toggle" onClick={() => toggleDay(giorno)}>
                     <span>{giorno}</span>
                     <span>{fatti}/{total} fatti</span>
+                  <div className="day-progress" aria-hidden="true">
+                    <span style={{ width: `${total > 0 ? (fatti / total) * 100 : 0}%` }} />
+                  </div>
                   </button>
                   {expanded && (
                     <div className="compiti">
+                  <div className="time-filter" role="tablist" aria-label="Filtro fascia giornata">
+                    {fasceGiornata.map(fascia => (
+                      <button
+                        key={fascia.id}
+                        type="button"
+                        className={fasciaGiornata === fascia.id ? 'active' : ''}
+                        onClick={() => setFasciaGiornata(fascia.id)}
+                      >
+                        <span>{fascia.emoji}</span>
+                        <span>{fascia.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
                       {tasks.length > 0 ? tasks.map(compito => {
                         const stato = statoSettimana[giorno]?.[compito.nome] || { assegnato: null, fatto: false }
                         return (
