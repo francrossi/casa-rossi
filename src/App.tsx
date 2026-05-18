@@ -126,6 +126,7 @@ const fasceGiornata: { id: FasciaGiornata; label: string; emoji: string }[] = [
 
 function App() {
   const [schermata, setSchermata] = useState<'settimana' | 'classifica' | 'personale' | 'storico'>('settimana')
+  const [personaSelezionata, setPersonaSelezionata] = useState<string | null>(null)
   const [statoSettimana, setStatoSettimana] = useState<StatoSettimana>({})
   const [reminderPersonali, setReminderPersonali] = useState<Reminder[]>([])
   const [storico, setStorico] = useState<StoricoSettimanale[]>([])
@@ -1175,7 +1176,7 @@ function App() {
                       </div>
                     ) : (
                       <div className="balance-cards">
-                        {persone.map(persona => {
+                        {(personaSelezionata ? [personaSelezionata] : persone).map(persona => {
                           const diff = balance[persona] ?? 0
                           const isCredit = diff >= 0
 
@@ -1210,8 +1211,28 @@ function App() {
               <p>Controlla compiti, reminder e avanzamento individuale di ogni membro della famiglia.</p>
             </div>
 
+            <div className="people-tabs" aria-label="Navigazione membri famiglia">
+              <button
+                type="button"
+                className={!personaSelezionata ? 'active' : ''}
+                onClick={() => setPersonaSelezionata(null)}
+              >
+                Tutti
+              </button>
+              {persone.map(persona => (
+                <button
+                  key={persona}
+                  type="button"
+                  className={personaSelezionata === persona ? 'active' : ''}
+                  onClick={() => setPersonaSelezionata(persona)}
+                >
+                  {persona}
+                </button>
+              ))}
+            </div>
+
             <div className="people-dashboard">
-              {persone.map(persona => {
+              {(personaSelezionata ? [personaSelezionata] : persone).map(persona => {
                 const personalTasks = compitiPersonali(persona)
                 const reminders = reminderPersonale(persona)
 
@@ -1221,11 +1242,34 @@ function App() {
                 const progress = totalItems > 0 ? Math.round((doneItems / totalItems) * 100) : 0
 
                 return (
-                  <div key={persona} className="person-card">
+                  <div
+                  key={persona}
+                  className={`person-card ${personaSelezionata === persona ? 'selected-person' : 'person-summary-only'}`}
+                  role={!personaSelezionata ? 'button' : undefined}
+                  tabIndex={!personaSelezionata ? 0 : undefined}
+                  onClick={() => {
+                    if (!personaSelezionata) setPersonaSelezionata(persona)
+                  }}
+                  onKeyDown={(event) => {
+                    if (!personaSelezionata && (event.key === 'Enter' || event.key === ' ')) {
+                      event.preventDefault()
+                      setPersonaSelezionata(persona)
+                    }
+                  }}
+                >
                     <div className="person-head">
                       <div>
                         <span className="screen-eyebrow">Membro famiglia</span>
-                        <h3>{persona}</h3>
+                        <button
+                          type="button"
+                          className={`person-name-button ${personaSelezionata === persona ? 'active' : ''}`}
+                          onClick={(event) => {
+                            event.stopPropagation()
+                            setPersonaSelezionata(personaSelezionata === persona ? null : persona)
+                          }}
+                        >
+                          {persona}
+                        </button>
                       </div>
                       <div className="person-percent">{progress}%</div>
                     </div>
