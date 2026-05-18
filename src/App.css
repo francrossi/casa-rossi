@@ -2580,3 +2580,363 @@ input[type="date"] {
   box-shadow: 0 10px 20px rgba(20,32,23,0.18) !important;
 }
 
+
+/* === CASA ROSSI WEEK DAY DETAIL VIEW === */
+
+.week-day-tabs {
+  position: sticky;
+  top: 72px;
+  z-index: 18;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: rgba(255,255,255,0.86);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  scrollbar-width: none;
+}
+
+.week-day-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.week-day-tabs button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  min-width: 58px;
+  padding: 8px 12px;
+  border-radius: 16px;
+  font-size: 0.9rem;
+  font-weight: 950;
+}
+
+.week-day-tabs button:first-child {
+  min-width: 112px;
+}
+
+.week-day-tabs button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 10px 22px rgba(50,166,74,0.25) !important;
+}
+
+.day-detail-toolbar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: center;
+  padding: 14px 16px;
+  border: 1px solid rgba(50,166,74,0.28);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 0% 0%, rgba(83,194,100,0.16), transparent 34%),
+    rgba(255,255,255,0.92);
+  box-shadow: var(--shadow);
+}
+
+.day-detail-toolbar span {
+  display: block;
+  color: #6a766c;
+  font-size: 0.76rem;
+  font-weight: 950;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.day-detail-toolbar strong {
+  display: block;
+  color: #142017;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 950;
+}
+
+.day-detail-toolbar button {
+  min-height: 44px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+.giorno.selected-day {
+  scroll-margin-top: 150px;
+}
+
+.giorno.selected-day .day-toggle {
+  cursor: default;
+}
+
+@media (max-width: 520px) {
+  .week-day-tabs {
+    top: 64px;
+    margin-left: -2px;
+    margin-right: -2px;
+  }
+
+  .week-day-tabs button {
+    min-width: 54px;
+    padding: 8px 10px;
+    font-size: 0.82rem;
+  }
+
+  .week-day-tabs button:first-child {
+    min-width: 104px;
+  }
+
+  .day-detail-toolbar {
+    grid-template-columns: 1fr;
+  }
+
+  .day-detail-toolbar button {
+    width: 100%;
+  }
+}
+
+
+/* === CASA ROSSI WEEK DAY TABS POLISH === */
+
+/* La barra dei giorni deve sembrare un selettore compatto, non una card gigante */
+.week-day-tabs {
+  position: sticky !important;
+  top: 74px !important;
+  z-index: 18 !important;
+
+  display: flex !important;
+  gap: 6px !important;
+  overflow-x: auto !important;
+
+  padding: 7px !important;
+  margin: 2px 0 8px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08) !important;
+
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  scrollbar-width: none !important;
+}
+
+.week-day-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.week-day-tabs button {
+  flex: 0 0 auto !important;
+  min-width: auto !important;
+  min-height: 34px !important;
+  padding: 7px 11px !important;
+
+  border-radius: 999px !important;
+  font-size: 0.78rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+
+  box-shadow: none !important;
+}
+
+.week-day-tabs button:first-child {
+  min-width: auto !important;
+  padding-left: 14px !important;
+  padding-right: 14px !important;
+}
+
+.week-day-tabs button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+/* La toolbar del giorno deve essere piccola */
+.day-detail-toolbar {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+
+  padding: 10px 12px !important;
+  border-radius: 20px !important;
+}
+
+.day-detail-toolbar span {
+  font-size: 0.66rem !important;
+}
+
+.day-detail-toolbar strong {
+  font-size: 1.08rem !important;
+}
+
+.day-detail-toolbar button {
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: 14px !important;
+  font-size: 0.82rem !important;
+}
+
+/* Quando guardi un solo giorno, la card deve partire pulita */
+.giorno.selected-day {
+  margin-top: 4px !important;
+}
+
+@media (max-width: 520px) {
+  .week-day-tabs {
+    top: 8px !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 6px !important;
+  }
+
+  .week-day-tabs button {
+    min-height: 32px !important;
+    padding: 6px 10px !important;
+    font-size: 0.74rem !important;
+  }
+
+  .week-day-tabs button:first-child {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  .day-detail-toolbar {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+  }
+
+  .day-detail-toolbar button {
+    width: 100% !important;
+  }
+}
+
+
+/* === CASA ROSSI WEEK DAY TABS SPECIFIC FIX === */
+
+/* Vince sulle vecchie regole .settimana > div e .settimana > div > button */
+.settimana > .week-day-tabs {
+  position: sticky !important;
+  top: 8px !important;
+  z-index: 30 !important;
+
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 6px !important;
+
+  width: 100% !important;
+  min-height: auto !important;
+  overflow-x: auto !important;
+
+  margin: 0 0 10px !important;
+  padding: 6px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: 0 8px 18px rgba(20, 32, 23, 0.08) !important;
+
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  scrollbar-width: none !important;
+}
+
+.settimana > .week-day-tabs::-webkit-scrollbar {
+  display: none !important;
+}
+
+.settimana > .week-day-tabs > button {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  width: auto !important;
+  min-width: 48px !important;
+  min-height: 34px !important;
+
+  padding: 7px 11px !important;
+
+  border: 1px solid rgba(36, 65, 42, 0.14) !important;
+  border-radius: 999px !important;
+  background: linear-gradient(180deg, #ffffff, #f6faf5) !important;
+  color: #172219 !important;
+
+  box-shadow: none !important;
+
+  font-size: 0.78rem !important;
+  font-weight: 950 !important;
+  line-height: 1 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+}
+
+.settimana > .week-day-tabs > button:first-child {
+  min-width: 94px !important;
+}
+
+.settimana > .week-day-tabs > button.active {
+  color: #ffffff !important;
+  border-color: transparent !important;
+  background: linear-gradient(135deg, var(--green), var(--green-dark)) !important;
+  box-shadow: 0 7px 14px rgba(50,166,74,0.22) !important;
+}
+
+/* Anche la toolbar deve vincere sulle regole vecchie delle card */
+.settimana > .day-detail-toolbar {
+  display: grid !important;
+  grid-template-columns: 1fr auto !important;
+  gap: 10px !important;
+  align-items: center !important;
+
+  width: 100% !important;
+  margin: 0 0 10px !important;
+  padding: 11px 12px !important;
+
+  border: 1px solid rgba(50,166,74,0.24) !important;
+  border-radius: 20px !important;
+  background: rgba(255,255,255,0.88) !important;
+  box-shadow: 0 8px 18px rgba(20,32,23,0.07) !important;
+}
+
+.settimana > .day-detail-toolbar button {
+  width: auto !important;
+  min-height: 38px !important;
+  padding: 8px 12px !important;
+  border-radius: 14px !important;
+  font-size: 0.82rem !important;
+  background: linear-gradient(135deg, #263629, #172219) !important;
+  color: #ffffff !important;
+  border-color: transparent !important;
+}
+
+@media (max-width: 520px) {
+  .settimana > .week-day-tabs {
+    top: 6px !important;
+  }
+
+  .settimana > .week-day-tabs > button {
+    min-width: 44px !important;
+    min-height: 32px !important;
+    padding: 6px 9px !important;
+    font-size: 0.72rem !important;
+  }
+
+  .settimana > .week-day-tabs > button:first-child {
+    min-width: 86px !important;
+  }
+
+  .settimana > .day-detail-toolbar {
+    grid-template-columns: 1fr !important;
+  }
+
+  .settimana > .day-detail-toolbar button {
+    width: 100% !important;
+  }
+}
+

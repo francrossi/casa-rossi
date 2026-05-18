@@ -142,6 +142,7 @@ function App() {
     }
   })
   const [expandedDays, setExpandedDays] = useState<Record<string, boolean>>({})
+  const [giornoSelezionato, setGiornoSelezionato] = useState<string | null>(null)
 
   const createInitialState = (): StatoSettimana => {
     const init: StatoSettimana = {}
@@ -532,10 +533,28 @@ function App() {
     return fasciaGiornata === 'tutti' || getFasciaCompito(compito.nome) === fasciaGiornata
   }
 
-  const toggleDay = (giorno: string) => {
-    const wasOpen = Boolean(expandedDays[giorno])
+  const apriGiorno = (giorno: string) => {
+    setGiornoSelezionato(giorno)
     setFasciaGiornata('tutti')
-    setExpandedDays(wasOpen ? {} : { [giorno]: true })
+    setExpandedDays({ [giorno]: true })
+
+    window.requestAnimationFrame(() => {
+      document.getElementById('giorno-dettaglio')?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      })
+    })
+  }
+
+  const tornaAllaSettimana = () => {
+    setGiornoSelezionato(null)
+    setExpandedDays({})
+    setFasciaGiornata('tutti')
+  }
+
+  const toggleDay = (giorno: string) => {
+    if (giornoSelezionato === giorno) return
+    apriGiorno(giorno)
   }
 
   const getStoricoBalance = () => {
@@ -949,15 +968,48 @@ function App() {
               </div>
             )}
 
+            <div className="week-day-tabs" aria-label="Navigazione giorni settimana">
+              <button
+                type="button"
+                className={!giornoSelezionato ? 'active' : ''}
+                onClick={tornaAllaSettimana}
+              >
+                Settimana
+              </button>
+              {giorni.map(giorno => (
+                <button
+                  key={giorno}
+                  type="button"
+                  className={giornoSelezionato === giorno ? 'active' : ''}
+                  onClick={() => apriGiorno(giorno)}
+                >
+                  {giorno.slice(0, 3)}
+                </button>
+              ))}
+            </div>
+
+            {giornoSelezionato && (
+              <div className="day-detail-toolbar">
+                <div>
+                  <span>Dettaglio giorno</span>
+                  <strong>{giornoSelezionato}</strong>
+                </div>
+                <button type="button" onClick={tornaAllaSettimana}>
+                  Torna alla settimana
+                </button>
+              </div>
+            )}
+
             {giorni.map(giorno => {
+              if (giornoSelezionato && giorno !== giornoSelezionato) return null
               const { total, fatti } = getDayStats(giorno)
-              const expanded = expandedDays[giorno]
+              const expanded = giornoSelezionato === giorno ? true : expandedDays[giorno]
               const tasks = compiti.filter(c => c.giorni.includes(giorno) && filterCompiti(c, giorno) && filterFasciaCompito(c))
               const dayPercent = total > 0 ? Math.round((fatti / total) * 100) : 0
               const dayMood = total > 0 && fatti === total ? 'done' : fatti > 0 ? 'progress' : 'todo'
               const dayStatus = dayMood === 'done' ? 'Completato' : dayMood === 'progress' ? 'In corso' : 'Da iniziare'
               return (
-                <div key={giorno} className={`giorno ${expanded ? 'expanded' : 'collapsed'} ${dayMood}`}>
+                <div key={giorno} id={giornoSelezionato === giorno ? 'giorno-dettaglio' : undefined} className={`giorno ${expanded ? 'expanded' : 'collapsed'} ${dayMood} ${giornoSelezionato === giorno ? 'selected-day' : ''}`}>
                   <button type="button" className="day-toggle" onClick={() => toggleDay(giorno)}>
                     <div className="day-main">
                       <div className="day-title-row">
